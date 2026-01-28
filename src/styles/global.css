@@ -1,0 +1,25 @@
+:root {
+  --background: #ffffff;
+  --primary-blue: #0077BE;
+  --secondary-blue: #00A8E8;
+  --admin-dark: #003D5C;
+  --text-main: #003D5C;
+  --text-muted: #6B7280;
+  --border-color: #E5E7EB;
+  --error-red: #FF4757;
+  --success-bg: #E6F7FF;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #ffffff;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+}
