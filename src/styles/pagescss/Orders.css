@@ -1,37 +1,38 @@
-.orders-page-container {
+﻿.orders_page_container {
     min-height: 100vh;
     background: #f8fafc;
+    /* Buffer for Fixed NavBar */
 }
 
-.orders-main {
+.orders_main {
     max-width: 800px;
     margin: 0 auto;
     padding: 30px 20px;
 }
 
-.orders-header {
+.orders_header {
     margin-bottom: 30px;
 }
 
-.orders-header h2 {
+.orders_header h2 {
     font-size: 24px;
     font-weight: 800;
     color: #111827;
     margin-bottom: 8px;
 }
 
-.orders-header p {
+.orders_header p {
     color: #6b7280;
     font-size: 14px;
 }
 
-.orders-list {
+.orders_list {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-.order-history-card {
+.order_history_card {
     background: white;
     padding: 20px;
     border-radius: 16px;
@@ -43,34 +44,34 @@
     transition: all 0.2s;
 }
 
-.order-history-card:hover {
+.order_history_card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     border-color: #0077BE;
 }
 
-.order-history-card.collected {
+.order_history_card.collected {
     filter: grayscale(0.8) opacity(0.7);
 }
 
-.order-info-left {
+.order_info_left {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 12px;
 }
 
-.order-shop-name {
+.order_shop_name {
     font-weight: 700;
     color: #111827;
     font-size: 16px;
 }
 
-.order-date {
+.order_date {
     font-size: 13px;
     color: #9ca3af;
 }
 
-.order-id-badge {
+.order_id_badge {
     font-family: monospace;
     font-size: 12px;
     color: #6b7280;
@@ -80,7 +81,7 @@
     width: fit-content;
 }
 
-.order-info-right {
+.order_info_right {
     text-align: right;
     display: flex;
     flex-direction: column;
@@ -88,13 +89,13 @@
     align-items: flex-end;
 }
 
-.order-total-price {
+.order_total_price {
     font-weight: 800;
     color: #0077BE;
     font-size: 18px;
 }
 
-.order-status-pill {
+.order_status_pill {
     font-size: 11px;
     font-weight: 700;
     padding: 4px 10px;
@@ -103,42 +104,85 @@
     letter-spacing: 0.05em;
 }
 
-.order-status-pill.pending {
-    background: #f0f9ff;
-    color: #0077BE;
+.order_status_pill.status_paid {
+    background: #dbeafe;
+    color: #1e40af;
 }
 
-.order-status-pill.collected {
+.order_status_pill.status_preparing {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.order_status_pill.status_ready {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.order_status_pill.status_completed {
     background: #f3f4f6;
     color: #6b7280;
 }
 
-.empty-orders {
+.order_status_pill.pending {
+    background: #f0f9ff;
+    color: #0077BE;
+}
+
+.order_status_pill.collected {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.order_status_pill.status_cancelled {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.order_history_card.cancelled {
+    background: #fef2f2;
+    border: 1.5px solid #fecaca;
+}
+
+.order_history_card.cancelled .order_shop_name {
+    color: #991b1b;
+}
+
+.order_history_card.cancelled .order_total_price {
+    color: #dc2626;
+}
+
+.order_history_card.cancelled:hover {
+    border-color: #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.empty_orders {
     text-align: center;
     padding: 60px 20px;
     color: #9ca3af;
 }
 
-.empty-orders p {
+.empty_orders p {
     margin-top: 10px;
 }
 
-@media (max-width: 640px) {
-    .orders-main {
+@media (max_width: 640px) {
+    .orders_main {
         padding: 20px 15px;
     }
 
-    .order-shop-name {
+    .order_shop_name {
         font-size: 15px;
     }
 
-    .order-total-price {
+    .order_total_price {
         font-size: 16px;
     }
 }
 
 /* Back Button Styles */
-.gaaaa-back-btn {
+.orders_back_btn {
     background: #fff;
     border: 1px solid #e5e7eb;
     padding: 8px;
@@ -153,21 +197,21 @@
     transition: all 0.2s;
 }
 
-.gaaaa-back-btn:hover {
+.orders_back_btn:hover {
     background: #f9fafb;
     border-color: #0077BE;
     transform: translateX(-2px);
 }
 
 /* Modal specific overrides for Orders page */
-.order-modal-body {
+.order_modal_body {
     padding: 40px 24px 20px !important;
 }
 
-.order-modal-info-card {
+.order_modal_info_card {
     background: #f3f4f6 !important;
 }
 
-.qr-collected-text {
+.qr_collected_text {
     color: #9ca3af !important;
 }

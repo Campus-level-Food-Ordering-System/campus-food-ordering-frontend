@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { OrderProvider } from './context/OrderContext';
 import { CartProvider } from './context/CartContext';
+import { MenuProvider } from './context/MenuContext';
 
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
@@ -10,36 +11,25 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import ChangePassword from './components/auth/ChangePassword';
 import EmailVerification from './components/auth/EmailVerification';
 import CollegeVerification from './components/auth/CollegeVerification';
-import Dashboard from './components/Dashboard';
-import MenuDashboard from './components/MenuDashboard';
-import Orders from './components/Orders';
-import LoadingDemo from './components/LoadingDemo';
+import AuthLayout from './components/auth/AuthLayout';
+import Dashboard from './components/user/Dashboard';
+import MenuDashboard from './components/menu/MenuDashboard';
+import Orders from './components/user/Orders';
+import LoadingDemo from './components/user/LoadingDemo';
 import LoadingPlate from './components/common/LoadingPlate';
 import OfflineMessage from './components/common/OfflineMessage';
+import VendorDashboard from './components/vendor/VendorDashboard';
+import AdminDashboard from './components/admin/AdminDashboard';
 
 export default function App() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    // Check if app resources are loaded
-    const checkAppReady = () => {
-      // Wait for DOM to be ready and resources to load
-      if (document.readyState === 'complete') {
-        // Add a minimum loading time of 1.5 seconds for smooth UX
-        setTimeout(() => {
-          setIsInitialLoading(false);
-        }, 1500);
-      } else {
-        window.addEventListener('load', () => {
-          setTimeout(() => {
-            setIsInitialLoading(false);
-          }, 1500);
-        });
-      }
-    };
-
-    checkAppReady();
+    // Ensure the loading screen transitions after a guaranteed duration
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 1200);
 
     // Listen for online/offline events
     const handleOnline = () => setIsOnline(true);
@@ -49,6 +39,7 @@ export default function App() {
     window.addEventListener('offline', handleOffline);
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
@@ -83,28 +74,37 @@ export default function App() {
   return (
     <AuthProvider>
       <OrderProvider>
-        <CartProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Navigate to="/signin" replace />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/change-password" element={<ChangePassword />} />
-              <Route path="/email-verification" element={<EmailVerification />} />
-              <Route path="/college-verification" element={<CollegeVerification />} />
+        <MenuProvider>
+          <CartProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Navigate to="/signin" replace />} />
 
-              {/* Demo Route */}
-              <Route path="/loading-demo" element={<LoadingDemo />} />
+                {/* Authentication Routes with Layout */}
+                <Route element={<AuthLayout />}>
+                  <Route path="/signin" element={<SignIn />} />
+                  <Route path="/signin/admin" element={<SignIn />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/change-password" element={<ChangePassword />} />
+                  <Route path="/email-verification" element={<EmailVerification />} />
+                  <Route path="/college-verification" element={<CollegeVerification />} />
+                </Route>
 
-              {/* Protected Routes */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/menu/:shopId" element={<MenuDashboard />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="*" element={<Navigate to="/signin" replace />} />
-            </Routes>
-          </Router>
-        </CartProvider>
+                {/* Demo Route */}
+                <Route path="/loading-demo" element={<LoadingDemo />} />
+
+                {/* Protected Routes */}
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/vendor-dashboard" element={<VendorDashboard />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/menu/:shopId" element={<MenuDashboard />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="*" element={<Navigate to="/signin" replace />} />
+              </Routes>
+            </Router>
+          </CartProvider>
+        </MenuProvider>
       </OrderProvider>
     </AuthProvider>
   );

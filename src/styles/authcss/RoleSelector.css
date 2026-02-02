@@ -1,11 +1,11 @@
-.role-selector-container {
+.role_selector_container {
   display: flex;
   justify-content: center;
   gap: 16px;
   margin-bottom: 32px;
 }
 
-.role-toggle-btn {
+.role_toggle_btn {
   padding: 10px 24px;
   border: 2px solid #0077BE;
   border-radius: 50px;
@@ -17,12 +17,12 @@
   cursor: pointer;
 }
 
-.role-toggle-btn:hover {
+.role_toggle_btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 119, 190, 0.15);
 }
 
-.role-toggle-btn.active {
+.role_toggle_btn.active {
   background: #0077BE;
   color: white;
   box-shadow: 0 4px 12px rgba(0, 119, 190, 0.3);

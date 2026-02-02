@@ -33,12 +33,12 @@ export const CartProvider = ({ children }) => {
     const addToCart = (shopId, itemToAdd) => {
         setCarts(prev => {
             const shopCart = prev[shopId] || [];
-            const existing = shopCart.find(item => item.id === itemToAdd.id);
+            const existing = shopCart.find(item => item.itemId === itemToAdd.itemId);
 
             let newCart;
             if (existing) {
                 newCart = shopCart.map(item =>
-                    item.id === itemToAdd.id ? { ...item, qty: item.qty + 1 } : item
+                    item.itemId === itemToAdd.itemId ? { ...item, qty: item.qty + 1 } : item
                 );
             } else {
                 newCart = [...shopCart, { ...itemToAdd, qty: 1 }];
@@ -52,8 +52,8 @@ export const CartProvider = ({ children }) => {
         setCarts(prev => {
             const shopCart = prev[shopId] || [];
             const newCart = shopCart.map(item =>
-                item.id === itemId ? { ...item, qty: Math.max(1, item.qty + delta) } : item
-            );
+                item.itemId === itemId ? { ...item, qty: item.qty + delta } : item
+            ).filter(item => item.qty > 0);
             return { ...prev, [shopId]: newCart };
         });
     };
@@ -61,7 +61,7 @@ export const CartProvider = ({ children }) => {
     const removeFromCart = (shopId, itemId) => {
         setCarts(prev => {
             const shopCart = prev[shopId] || [];
-            const newCart = shopCart.filter(item => item.id !== itemId);
+            const newCart = shopCart.filter(item => item.itemId !== itemId);
             return { ...prev, [shopId]: newCart };
         });
     };

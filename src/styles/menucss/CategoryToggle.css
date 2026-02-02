@@ -1,0 +1,81 @@
+/* Category Pill Container */
+.category_btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 5.5rem;
+    height: 8.4rem;
+    padding: 0.5rem;
+    border-radius: 2.5rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+}
+
+.category_btn:hover {
+    transform: translateY(-0.25rem);
+}
+
+/* Active State */
+.category_btn.active {
+    background-color: #FF5E4D;
+    box-shadow: 0 15px 30px -5px rgba(255, 94, 77, 0.4), 0 8px 10px -6px rgba(255, 94, 77, 0.3);
+}
+
+/* Inactive State */
+.category_btn.inactive {
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+}
+
+
+/* Inner Circle Container */
+.cat_inner {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.25rem;
+}
+
+.category_btn.active .cat_inner {
+    background-color: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Emoji */
+.cat_emoji {
+    font-size: 1.875rem;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+    transition: transform 0.3s;
+}
+
+.category_btn.inactive:hover .cat_emoji {
+    transform: scale(1.1);
+}
+
+/* Toggle Text */
+.cat_text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: 0.025em;
+}
+
+.category_btn.active .cat_text {
+    color: white;
+}
+
+.category_btn.inactive .cat_text {
+    color: #6b7280;
+}
+
+.category_btn.inactive:hover .cat_text {
+    color: #1f2937;
+}

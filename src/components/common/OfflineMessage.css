@@ -1,4 +1,4 @@
-.offline-container {
+.offline_container {
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -7,7 +7,7 @@
     padding: 20px;
 }
 
-.offline-card {
+.offline_card {
     background: white;
     border-radius: 24px;
     padding: 60px 40px;
@@ -20,7 +20,7 @@
 }
 
 /* WiFi Icon */
-.wifi-icon {
+.wifi_icon {
     width: 120px;
     height: 120px;
     margin: 0 auto 30px;
@@ -32,20 +32,20 @@
     animation: pulse 2s ease-in-out infinite;
 }
 
-.wifi-icon svg {
+.wifi_icon svg {
     width: 60px;
     height: 60px;
 }
 
 /* Text */
-.offline-title {
+.offline_title {
     font-size: 28px;
     font-weight: 700;
     color: #DC2626;
     margin: 0 0 16px 0;
 }
 
-.offline-message {
+.offline_message {
     font-size: 16px;
     color: #6B7280;
     line-height: 1.6;
@@ -53,7 +53,7 @@
 }
 
 /* Checklist */
-.offline-checklist {
+.offline_checklist {
     background: #F9FAFB;
     border-radius: 16px;
     padding: 24px;
@@ -61,7 +61,7 @@
     text-align: left;
 }
 
-.check-item {
+.check_item {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -70,17 +70,17 @@
     color: #374151;
 }
 
-.check-item:not(:last-child) {
+.check_item:not(:last-child) {
     border-bottom: 1px solid #E5E7EB;
 }
 
-.check-icon {
+.check_icon {
     font-size: 24px;
     flex-shrink: 0;
 }
 
 /* Retry Button */
-.retry-btn {
+.retry_btn {
     width: 100%;
     padding: 16px 24px;
     background: linear-gradient(135deg, #DC2626, #EF4444);
@@ -98,17 +98,17 @@
     box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
 }
 
-.retry-btn:hover {
+.retry_btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4);
 }
 
-.retry-btn:active {
+.retry_btn:active {
     transform: translateY(0);
 }
 
 /* Decorative Clouds */
-.offline-decoration {
+.offline_decoration {
     position: absolute;
     top: 0;
     left: 0;
@@ -125,19 +125,19 @@
     animation: cloudFloat 20s linear infinite;
 }
 
-.cloud-1 {
+.cloud_1 {
     top: 10%;
     left: -50px;
     animation-delay: 0s;
 }
 
-.cloud-2 {
+.cloud_2 {
     top: 50%;
     left: -50px;
     animation-delay: 7s;
 }
 
-.cloud-3 {
+.cloud_3 {
     top: 80%;
     left: -50px;
     animation-delay: 14s;
@@ -180,33 +180,33 @@
 
 /* Responsive */
 @media (max-width: 480px) {
-    .offline-card {
+    .offline_card {
         padding: 40px 24px;
     }
 
-    .wifi-icon {
+    .wifi_icon {
         width: 100px;
         height: 100px;
     }
 
-    .wifi-icon svg {
+    .wifi_icon svg {
         width: 50px;
         height: 50px;
     }
 
-    .offline-title {
+    .offline_title {
         font-size: 24px;
     }
 
-    .offline-message {
+    .offline_message {
         font-size: 14px;
     }
 
-    .check-item {
+    .check_item {
         font-size: 14px;
     }
 
-    .check-icon {
+    .check_icon {
         font-size: 20px;
     }
 }

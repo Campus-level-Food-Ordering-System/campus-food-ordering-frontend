@@ -3,19 +3,19 @@ import './LoadingPlate.css';
 
 const LoadingPlate = ({ message = 'Loading delicious food...' }) => {
     return (
-        <div className="loading-plate-container">
-            <div className="plate-wrapper">
+        <div className="loading_plate_container">
+            <div className="plate_wrapper">
                 {/* Plate */}
                 <div className="plate">
-                    <div className="plate-inner"></div>
+                    <div className="plate_inner"></div>
                 </div>
 
                 {/* Food items appearing on plate */}
-                <div className="food-items">
-                    <div className="food-item food-1">🍚</div> {/* Fried Rice */}
-                    <div className="food-item food-2">🍜</div> {/* Noodles */}
-                    <div className="food-item food-3">🫓</div> {/* Parota */}
-                    <div className="food-item food-4">🥞</div> {/* Dosa */}
+                <div className="food_items">
+                    <div className="food_item food_1">🍚</div> {/* Fried Rice */}
+                    <div className="food_item food_2">🍜</div> {/* Noodles */}
+                    <div className="food_item food_3">🫓</div> {/* Parota */}
+                    <div className="food_item food_4">🥞</div> {/* Dosa */}
                 </div>
 
                 {/* Utensils */}
@@ -26,10 +26,10 @@ const LoadingPlate = ({ message = 'Loading delicious food...' }) => {
             </div>
 
             {/* Loading text */}
-            <p className="loading-text">{message}</p>
+            <p className="loading_text">{message}</p>
 
             {/* Loading dots */}
-            <div className="loading-dots">
+            <div className="loading_dots">
                 <span></span>
                 <span></span>
                 <span></span>

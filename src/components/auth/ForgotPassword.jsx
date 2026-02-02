@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, KeyRound, ArrowLeft } from 'lucide-react';
-import AuthLayout from './AuthLayout';
 import '../../styles/authcss/SignIn.css';
 import '../../styles/authcss/ForgotPassword.css';
 
@@ -73,38 +72,38 @@ export default function ForgotPassword() {
   };
 
   return (
-    <AuthLayout>
-      <button onClick={() => navigate('/signin')} className="back-btn">
+    <>
+      <button onClick={() => navigate('/signin')} className="back_btn">
         <ArrowLeft size={12} /> Back
       </button>
 
-      <div className="auth-header">
+      <div className="auth_header">
         <h2>Forgot Password? 🔑</h2>
         <p>{codeSent ? 'Enter the code sent to your email' : 'Enter your email to receive a reset code'}</p>
       </div>
 
       {!codeSent ? (
-        <form onSubmit={handleSendCode} className="auth-form">
-          <div className="form-group">
-            <label><Mail size={16} /> Email Address</label>
+        <form onSubmit={handleSendCode} className="auth_form">
+          <div className="form_group">
+            <label>Email Address</label>
             <input
               type="email"
               placeholder="student@skct.edu.in"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required className="form-input"
+              required className="form_input"
             />
           </div>
-          <button type="submit" className="submit-btn" disabled={isLoading}>
+          <button type="submit" className="submit_btn" disabled={isLoading}>
             {isLoading ? 'Sending...' : 'Send Code'}
           </button>
         </form>
       ) : (
-        <form onSubmit={handleVerify} className="auth-form">
-          <div className="success-banner">Code sent to <b>{email}</b></div>
-          <div className="form-group">
-            <label><KeyRound size={16} /> Verification Code</label>
-            <div className="otp-input-group-forgot">
+        <form onSubmit={handleVerify} className="auth_form">
+          <div className="success_banner">Code sent to <b>{email}</b></div>
+          <div className="form_group">
+            <label>Verification Code</label>
+            <div className="otp_input_group_forgot">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -116,17 +115,17 @@ export default function ForgotPassword() {
                   onChange={(e) => handleChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
-                  className="otp-box-forgot"
+                  className="otp_box_forgot"
                   required
                 />
               ))}
             </div>
           </div>
-          <button type="submit" className="submit-btn" disabled={isLoading}>
+          <button type="submit" className="submit_btn" disabled={isLoading}>
             {isLoading ? 'Verifying...' : 'Verify Code'}
           </button>
         </form>
       )}
-    </AuthLayout>
+    </>
   );
 }

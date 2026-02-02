@@ -1,0 +1,349 @@
+.vendor_orders {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.orders_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.orders_header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.orders_filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter_btn {
+    padding: 0.6rem 1.2rem;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter_btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.filter_btn.active {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+/* Loading & Empty States */
+.orders_loading,
+.orders_empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #999;
+}
+
+.orders_empty svg {
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+.orders_empty p {
+    font-size: 1.1rem;
+    color: #999;
+}
+
+/* Orders Grid */
+.orders_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Order Card */
+.order_card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.order_card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.order_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order_id {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.order_number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.order_time {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.order_status {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status_paid {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status_preparing {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.status_ready {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.order_customer {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.order_items {
+    margin-bottom: 1rem;
+}
+
+.order_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.item_name {
+    color: #555;
+}
+
+.item_price {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.order_footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.order_total {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.order_total strong {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.total_amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.order_action_btn {
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.order_action_btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive */
+@media (max_width: 768px) {
+    .orders_grid {
+        grid-template-columns: 1fr;
+    }
+
+    .orders_header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max_width: 426px) {
+    .orders_header h2 {
+        font-size: 1.5rem;
+    }
+
+    .orders_filters {
+        width: 100%;
+        overflow-x: auto;
+        _webkit_overflow_scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .orders_filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .filter_btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .order_card {
+        padding: 1rem;
+    }
+
+    .order_number {
+        font-size: 1rem;
+    }
+
+    .order_action_btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+.vendor_cancel_banner_container {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.vendor_cancel_banner {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    padding: 14px;
+    width: 100%;
+}
+
+.order_card:has(.vendor_cancel_banner_container) {
+    background: #fef2f2;
+    border: 2px solid #fecaca;
+}
+
+.v_cancel_header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #ef4444;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.v_cancel_header strong {
+    font-size: 0.95rem;
+    color: #991b1b;
+}
+
+.v_cancel_time {
+    font-size: 0.8rem;
+    color: #b91c1c;
+    margin: 2px 0 0 0;
+}
+
+.v_cancel_reason_box {
+    background: rgba(255, 255, 255, 0.7);
+    border-left: 3px solid #ef4444;
+    padding: 8px 10px;
+    border-radius: 4px;
+    margin-top: 6px;
+}
+
+.v_cancel_reason_box strong {
+    display: block;
+    color: #991b1b;
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+}
+
+.v_cancel_reason_box p {
+    color: #7f1d1d;
+    font-size: 0.85rem;
+    font-style: italic;
+    margin: 0;
+}
+
+

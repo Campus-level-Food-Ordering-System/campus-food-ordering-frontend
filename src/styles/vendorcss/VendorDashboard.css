@@ -1,0 +1,347 @@
+.vendor_dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* Header */
+.vendor_header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.vendor_header_content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vendor_logo h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  margin-bottom: 0.25rem;
+}
+
+.vendor_email {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Header Actions */
+.vendor_header_actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Shop Status Toggle */
+.shop_status_toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.4rem 0.8rem;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  user-select: none;
+}
+
+.shop_status_toggle.active {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.shop_status_toggle.suspended {
+  cursor: not-allowed;
+  opacity: 0.7;
+  background: rgba(107, 114, 128, 0.1);
+  border-color: rgba(107, 114, 128, 0.3);
+  filter: grayscale(0.5);
+}
+
+.shop_status_toggle.suspended .status_label {
+  color: #6b7280;
+}
+
+.shop_status_toggle.suspended .toggle_switch {
+  background: rgba(107, 114, 128, 0.2);
+}
+
+.admin_suspension_alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(244, 63, 94, 0.1);
+  color: #f43f5e;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid rgba(244, 63, 94, 0.2);
+  animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.2);
+  }
+
+  70% {
+    box-shadow: 0 0 0 6px rgba(244, 63, 94, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+  }
+}
+
+.shop_status_toggle.inactive {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.3);
+}
+
+.status_label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.active .status_label {
+  color: #10b981;
+}
+
+.inactive .status_label {
+  color: #f43f5e;
+}
+
+.toggle_switch {
+  width: 36px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.active .toggle_switch {
+  background: #10b981;
+}
+
+.toggle_knob {
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.active .toggle_knob {
+  left: 19px;
+}
+
+.shop_status_toggle:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.shop_status_toggle:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.notification_badge {
+  position: relative;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.notification_badge:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.badge_count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4757;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.logout_btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout_btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Navigation */
+.vendor_nav {
+  background: white;
+  border-bottom: 2px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.vendor_nav_content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 2rem;
+}
+
+.nav_tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.nav_tab:hover {
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.nav_tab.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+.tab_badge {
+  background: #ff4757;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Main Content */
+.vendor_main {
+  padding: 2rem;
+}
+
+.vendor_content {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max_width: 768px) {
+  .vendor_header_content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .vendor_nav_content {
+    overflow-x: auto;
+    padding: 0 1rem;
+  }
+
+  .nav_tab {
+    white-space: nowrap;
+    padding: 1rem;
+  }
+
+  .vendor_main {
+    padding: 1rem;
+  }
+}
+
+@media (max_width: 426px) {
+  .vendor_header {
+    padding: 1rem;
+  }
+
+  .vendor_logo h1 {
+    font-size: 1.25rem;
+  }
+
+  .vendor_email {
+    font-size: 0.8rem;
+  }
+
+  .logout_btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .vendor_nav_content {
+    overflow-x: auto;
+    padding: 0 0.5rem;
+    gap: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .vendor_nav_content::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari */
+  }
+
+  .nav_tab {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    min-width: fit-content;
+    flex-shrink: 0;
+  }
+
+  .nav_tab svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .nav_tab span {
+    font-size: 0.85rem;
+  }
+
+  .vendor_main {
+    padding: 0.75rem;
+  }
+}
+
+

@@ -1,4 +1,4 @@
-.loading-plate-container {
+.loading_plate_container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -8,7 +8,7 @@
 }
 
 /* Plate Wrapper */
-.plate-wrapper {
+.plate_wrapper {
     position: relative;
     width: 200px;
     height: 200px;
@@ -32,7 +32,7 @@
     animation: plateRotate 3s ease-in-out infinite;
 }
 
-.plate-inner {
+.plate_inner {
     width: 140px;
     height: 140px;
     border: 4px solid #9ca3af;
@@ -41,7 +41,7 @@
 }
 
 /* Food Items */
-.food-items {
+.food_items {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -50,7 +50,7 @@
     height: 120px;
 }
 
-.food-item {
+.food_item {
     position: absolute;
     font-size: 38px;
     opacity: 0;
@@ -59,25 +59,25 @@
 }
 
 /* Food item positions */
-.food-1 {
+.food_1 {
     top: 10%;
     left: 10%;
     animation: foodAppear 2s ease-in-out 0.2s infinite;
 }
 
-.food-2 {
+.food_2 {
     top: 10%;
     right: 10%;
     animation: foodAppear 2s ease-in-out 0.5s infinite;
 }
 
-.food-3 {
+.food_3 {
     bottom: 10%;
     left: 10%;
     animation: foodAppear 2s ease-in-out 0.8s infinite;
 }
 
-.food-4 {
+.food_4 {
     bottom: 10%;
     right: 10%;
     animation: foodAppear 2s ease-in-out 1.1s infinite;
@@ -113,7 +113,7 @@
 }
 
 /* Loading Text */
-.loading-text {
+.loading_text {
     margin-top: 30px;
     font-size: 18px;
     font-weight: 600;
@@ -122,13 +122,13 @@
 }
 
 /* Loading Dots */
-.loading-dots {
+.loading_dots {
     display: flex;
     gap: 8px;
     margin-top: 12px;
 }
 
-.loading-dots span {
+.loading_dots span {
     width: 8px;
     height: 8px;
     background: #0077BE;
@@ -136,15 +136,15 @@
     animation: dotBounce 1.4s ease-in-out infinite;
 }
 
-.loading-dots span:nth-child(1) {
+.loading_dots span:nth-child(1) {
     animation-delay: 0s;
 }
 
-.loading-dots span:nth-child(2) {
+.loading_dots span:nth-child(2) {
     animation-delay: 0.2s;
 }
 
-.loading-dots span:nth-child(3) {
+.loading_dots span:nth-child(3) {
     animation-delay: 0.4s;
 }
 
@@ -239,8 +239,8 @@
 }
 
 /* Responsive */
-@media (max-width: 480px) {
-    .plate-wrapper {
+@media (max_width: 480px) {
+    .plate_wrapper {
         width: 160px;
         height: 160px;
     }
@@ -250,19 +250,19 @@
         height: 140px;
     }
 
-    .plate-inner {
+    .plate_inner {
         width: 110px;
         height: 110px;
     }
 
     /* Smaller food items container */
-    .food-items {
+    .food_items {
         width: 90px;
         height: 90px;
     }
 
     /* Smaller food emojis */
-    .food-item {
+    .food_item {
         font-size: 20px;
     }
 
@@ -280,7 +280,7 @@
         right: -30px;
     }
 
-    .loading-text {
+    .loading_text {
         font-size: 16px;
     }
 }

@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import AuthLayout from './AuthLayout';
 import '../../styles/authcss/EmailVerification.css';
 
 export default function EmailVerification() {
@@ -69,21 +68,21 @@ export default function EmailVerification() {
   };
 
   return (
-    <AuthLayout>
-      <div className="verify-container">
-        <div className="mail-icon-wrapper">
-          <div className="mail-icon">@</div>
+    <>
+      <div className="verify_container">
+        <div className="mail_icon_wrapper">
+          <div className="mail_icon">@</div>
         </div>
 
-        <h2 className="verify-title">Verify Your Email</h2>
-        <p className="verify-text">
+        <h2 className="verify_title">Verify Your Email</h2>
+        <p className="verify_text">
           We've sent a verification code to<br />
-          <span className="email-highlight">{email}</span>
+          <span className="email_highlight">{email}</span>
         </p>
 
-        <form onSubmit={handleVerify} className="verify-form">
-          <label className="verify-label">Enter Verification Code</label>
-          <div className="otp-input-group">
+        <form onSubmit={handleVerify} className="verify_form">
+          <label className="verify_label">Enter Verification Code</label>
+          <div className="otp_input_group">
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -95,21 +94,21 @@ export default function EmailVerification() {
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onPaste={handlePaste}
-                className="otp-box"
+                className="otp_box"
                 required
               />
             ))}
           </div>
 
-          <button type="submit" className="verify-btn" disabled={isLoading}>
+          <button type="submit" className="verify_btn" disabled={isLoading}>
             {isLoading ? 'Verifying...' : 'Verify'}
           </button>
         </form>
 
-        <div className="verify-footer">
-          Didn't receive code? <button type="button" className="resend-link">Resend</button>
+        <div className="verify_footer">
+          Didn't receive code? <button type="button" className="resend_link">Resend</button>
         </div>
       </div>
-    </AuthLayout>
+    </>
   );
 }
