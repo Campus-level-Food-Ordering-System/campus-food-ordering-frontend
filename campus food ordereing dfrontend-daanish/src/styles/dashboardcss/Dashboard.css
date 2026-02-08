@@ -1,0 +1,371 @@
+.dashboard-container {
+  min-height: 100vh;
+  background: #F9FAFB;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Note: Emoji pattern removed as per request */
+
+.dashboard-main {
+  margin: 0 auto;
+  padding: 32px 24px 32px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Welcome Banner */
+.welcome-banner {
+  margin-bottom: 32px;
+  text-align: center;
+  animation: phaseDown 0.8s ease-out;
+}
+
+.welcome-banner h2 {
+  font-size: 30px;
+  color: #003D5C;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.welcome-banner p {
+  color: #6B7280;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Shops Grid Layout */
+.shops-grid {
+  display: grid;
+  /* UPDATED: minmax 280px ensures it fits on small mobile screens without overflow */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 48px;
+  /* animation: slideUp 0.6s ease-out; Removed to allow individual card entry */
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 640px) {
+  .dashboard-main {
+    padding: 24px 16px;
+    /* Reduced padding for mobile */
+  }
+
+  .shops-grid {
+    gap: 12px;
+    /* Decreased space */
+    grid-template-columns: 1fr 1fr;
+    /* Make items smaller (2 columns) */
+  }
+
+  .welcome-banner h2 {
+    font-size: 24px;
+  }
+
+  .welcome-banner p {
+    font-size: 14px;
+  }
+
+  /* Hide specific orbs on mobile as requested */
+  .blob-1,
+  .blob-2 {
+    display: none;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes phaseDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Card One-by-One Entry Animations --- */
+@keyframes cardEnterLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-60px) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes cardEnterRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes cardEnterBottom {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cardEnterTop {
+  from {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.shops-grid .shop-card {
+  opacity: 0;
+  /* Hidden by default */
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Bouncy stylish feel */
+  animation-fill-mode: forwards;
+}
+
+/* Staggered Directions [Left, Up, Right, Down pattern] */
+.shops-grid .shop-card:nth-child(1) {
+  animation-name: cardEnterLeft;
+  animation-delay: 0.1s;
+}
+
+.shops-grid .shop-card:nth-child(2) {
+  animation-name: cardEnterBottom;
+  animation-delay: 0.2s;
+}
+
+.shops-grid .shop-card:nth-child(3) {
+  animation-name: cardEnterRight;
+  animation-delay: 0.3s;
+}
+
+.shops-grid .shop-card:nth-child(4) {
+  animation-name: cardEnterTop;
+  animation-delay: 0.4s;
+}
+
+.shops-grid .shop-card:nth-child(5) {
+  animation-name: cardEnterLeft;
+  animation-delay: 0.5s;
+}
+
+.shops-grid .shop-card:nth-child(6) {
+  animation-name: cardEnterBottom;
+  animation-delay: 0.6s;
+}
+
+.shops-grid .shop-card:nth-child(7) {
+  animation-name: cardEnterRight;
+  animation-delay: 0.7s;
+}
+
+.shops-grid .shop-card:nth-child(8) {
+  animation-name: cardEnterTop;
+  animation-delay: 0.8s;
+}
+
+/* Animated Blobs (Defined Circles) */
+.animated-blobs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.35;
+  /* Lighter and less distracting */
+}
+
+/* Blob 1: Top-Left Edge */
+.blob-1 {
+  width: 200px;
+  height: 200px;
+  background: #FF6347;
+  top: -80px;
+  left: -80px;
+  animation: pulseEdge 4s infinite alternate ease-in-out;
+}
+
+/* Blob 2: Bottom-Right Edge */
+.blob-2 {
+  width: 250px;
+  height: 250px;
+  background: #FF6347;
+  bottom: -100px;
+  right: -100px;
+  animation: pulseEdge 5s infinite alternate-reverse ease-in-out;
+}
+
+/* Blob 3: Roaming Center */
+.blob-3 {
+  width: 100px;
+  height: 100px;
+  background: #FF6347;
+  top: 30%;
+  left: 30%;
+  animation: roam 20s infinite linear;
+}
+
+/* Blob 4: Top-Right Edge */
+.blob-4 {
+  width: 180px;
+  height: 180px;
+  background: #FF6347;
+  top: -60px;
+  right: -60px;
+  animation: pulseEdge 6s infinite alternate ease-in-out;
+}
+
+/* Blob 5: Bottom-Left Edge */
+.blob-5 {
+  width: 220px;
+  height: 220px;
+  background: #FF6347;
+  bottom: -90px;
+  left: -90px;
+  animation: pulseEdge 7s infinite alternate-reverse ease-in-out;
+}
+
+/* Blob 6: Roaming */
+.blob-6 {
+  width: 120px;
+  height: 120px;
+  background: #FF6347;
+  top: 60%;
+  left: 70%;
+  animation: roamReverse 25s infinite linear;
+}
+
+/* Blob 7: Small Roaming */
+.blob-7 {
+  width: 80px;
+  height: 80px;
+  background: #FF6347;
+  top: 80%;
+  left: 20%;
+  animation: roam 18s infinite linear reverse;
+}
+
+/* Blob 8: Random Roaming */
+.blob-8 {
+  width: 140px;
+  height: 140px;
+  background: #FF6347;
+  top: 45%;
+  left: 85%;
+  animation: roamReverse 22s infinite linear;
+}
+
+/* Blob 9: Small Random Roaming */
+.blob-9 {
+  width: 90px;
+  height: 90px;
+  background: #FF6347;
+  top: 15%;
+  left: 50%;
+  animation: roam 26s infinite linear;
+}
+
+@keyframes pulseEdge {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes roam {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  25% {
+    transform: translate(100px, 50px);
+  }
+
+  50% {
+    transform: translate(50px, 150px);
+  }
+
+  75% {
+    transform: translate(-50px, 80px);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes roamReverse {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  25% {
+    transform: translate(-80px, -40px);
+  }
+
+  50% {
+    transform: translate(-40px, -120px);
+  }
+
+  75% {
+    transform: translate(40px, -60px);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
