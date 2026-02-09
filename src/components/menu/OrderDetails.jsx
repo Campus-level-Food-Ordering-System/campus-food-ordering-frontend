@@ -1,57 +1,111 @@
 import React from 'react';
-import { Trash2, Plus, Minus, X } from 'lucide-react';
+import { ShoppingCart, Settings, X, ChevronLeft, ChevronRight, MapPin, Clock } from 'lucide-react';
 import '../../styles/menucss/OrderDetails.css';
 
-const OrderDetails = ({ cartItems, onUpdateQty, onRemove, onClose, isMobile }) => {
-  const total = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+const OrderDetails = ({ cartItems, onUpdateQty, onRemove, onClose, onCheckout, isMobile, shopName, isCollapsed, toggleCollapse }) => {
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const discount = 0; // Mock
+  const tax = subtotal * 0.05; // Mock 5% tax
+  const total = subtotal - discount + tax;
+
+  const totalItems = cartItems.reduce((sum, item) => sum + item.qty, 0);
 
   return (
-    <div className="order-details-panel">
-      <div className="order-header">
-        <h2>My Orders</h2>
-        {/* Close button only shows on mobile */}
-        {isMobile && (
-          <button className="gaaaa-close-btn" onClick={onClose}>
-            <X size={24} />
+    <div className={`order_sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      <div className="sidebar_top_icons">
+        <div className="sidebar_top_left">
+          <button className="sidebar_collapse_btn" onClick={toggleCollapse} title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}>
+            {isCollapsed ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          </button>
+          {!isCollapsed ? (
+            <div className="sidebar_orders_title">My Orders</div>
+          ) : (
+            <div className="sidebar_collapsed_label">
+              <span className="vertical_text">MY ORDERS</span>
+              <span className="collapsed_count">{totalItems}</span>
+            </div>
+          )}
+        </div>
+        {!isCollapsed && (
+          <button className="sidebar_close_btn" onClick={onClose} aria-label="Close sidebar">
+            <X size={20} />
           </button>
         )}
       </div>
 
-      <div className="order-list">
-        {cartItems.length === 0 ? (
-          <div className="empty-state">No items yet</div>
-        ) : (
-          cartItems.map((item) => (
-            <div key={item.id} className="order-item">
-              <span className="item-name">{item.name}</span>
-
-              <div className="qty-control">
-                <button onClick={() => onUpdateQty(item.id, -1)} disabled={item.qty <= 1}>
-                  <Minus size={12} />
-                </button>
-                <span className="qty-value">{item.qty}</span>
-                <button onClick={() => onUpdateQty(item.id, 1)}>
-                  <Plus size={12} />
-                </button>
+      <div className="sidebar_content_wrapper">
+        {/* Info row */}
+        {/* {!isCollapsed && (
+          <div className="sidebar_info_container">
+            <div className="sidebar_info_item">
+              <span className="sidebar_info_label">Address</span>
+              <div className="sidebar_info_group">
+                <MapPin size={14} className="text_orange" />
+                <span className="sidebar_info_value">Campus Center</span>
               </div>
-
-              <span className="item-price">₹{(item.price * item.qty).toFixed(2)}</span>
-
-              <button className="gaaaa-delete-btn" onClick={() => onRemove(item.id)}>
-                <Trash2 size={16} />
-              </button>
             </div>
-          ))
-        )}
-      </div>
+            <div className="sidebar_info_item">
+              <span className="sidebar_info_label">Estimate</span>
+              <div className="sidebar_info_group">
+                <Clock size={14} className="text_orange" />
+                <span className="sidebar_info_value">15-20 mins</span>
+              </div>
+            </div>
+          </div>
+        )} */}
 
-      <div className="order-footer">
-        <div className="total-row">
-          <span>Total</span>
-          <span className="total-price">₹{total.toFixed(2)}</span>
+        {/* Order Items List */}
+        <div className="sidebar_order_list">
+          {cartItems.length === 0 ? (
+            <div className="sidebar_empty_state">No items in cart</div>
+          ) : (
+            cartItems.map((item) => (
+              <div key={item.itemId} className="sidebar_order_item">
+                <div className="sidebar_item_top">
+                  <img src={item.image} alt={item.name} className="sidebar_item_img" />
+                  <div className="sidebar_item_details">
+                    <span className="sidebar_item_name">{item.name}</span>
+                    <div className="sidebar_qty_control">
+                      <button className="sidebar_qty_btn" onClick={() => onUpdateQty(item.itemId, -1)}>-</button>
+                      <span className="sidebar_qty_val">{item.qty}</span>
+                      <button className="sidebar_qty_btn" onClick={() => onUpdateQty(item.itemId, 1)}>+</button>
+                    </div>
+                  </div>
+                  <span className="sidebar_item_price">₹{(item.price * item.qty).toFixed(2)}</span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
-        <button className="gaaaa-checkout-btn" disabled={cartItems.length === 0}>
-          Checkout
+
+        {/* Summary */}
+        <div className="sidebar_summary_card">
+          <div className="sidebar_summary_row">
+            <span className="sidebar_summary_label">Subtotal</span>
+            <span className="sidebar_summary_val">₹{subtotal.toFixed(2)}</span>
+          </div>
+          <div className="sidebar_summary_row">
+            <span className="sidebar_summary_label">Discount</span>
+            <span className="sidebar_summary_val">-₹{discount.toFixed(2)}</span>
+          </div>
+          <div className="sidebar_summary_row">
+            <span className="sidebar_summary_label">Tax (5%)</span>
+            <span className="sidebar_summary_val">₹{tax.toFixed(2)}</span>
+          </div>
+          <div className="sidebar_divider"></div>
+          <div className="sidebar_total_row">
+            <span className="sidebar_total_label">Total</span>
+            <span className="sidebar_total_val">₹{total.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* Button */}
+        <button
+          className="sidebar_checkout_btn"
+          disabled={cartItems.length === 0}
+          onClick={onCheckout}
+        >
+          Continue to payment
         </button>
       </div>
     </div>

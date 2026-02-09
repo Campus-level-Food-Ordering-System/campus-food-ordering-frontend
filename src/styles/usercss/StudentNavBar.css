@@ -1,0 +1,210 @@
+.student_navbar_container {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    position: fixed;
+    /* Changed from sticky to fixed */
+    top: 0;
+    left: 0;
+    /* Added to cover width correctly */
+    right: 0;
+    /* Added to cover width correctly */
+    z-index: 1000;
+}
+
+.student_navbar_content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Logo */
+.student_logo_section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.student_logo_emoji {
+    font-size: 32px;
+}
+
+.student_logo_text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: #003D5C;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.student_logo_text p {
+    font-size: 12px;
+    color: #6B7280;
+    margin: 0;
+}
+
+/* Profile Button */
+.student_profile_section {
+    position: relative;
+    z-index: 1001;
+}
+
+.student_profile_btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #0077BE, #00A8E8);
+    color: white;
+    border-radius: 99px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.student_profile_btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 119, 190, 0.3);
+}
+
+.student_profile_icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.student_profile_label {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* Dropdown */
+.student_arrow {
+    transition: transform 0.3s;
+}
+
+.student_arrow.rotate {
+    transform: rotate(180deg);
+}
+
+.student_profile_dropdown {
+    position: absolute;
+    right: 0;
+    margin-top: 8px;
+    width: 220px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid #E5E7EB;
+    overflow: hidden;
+    animation: studentSlideDown 0.2s ease-out;
+    z-index: 9999;
+}
+
+.student_dropdown_header {
+    padding: 16px;
+    border-bottom: 1px solid #E5E7EB;
+    background-color: #f9fafb;
+}
+
+.student_user_role {
+    font-weight: 600;
+    color: #003D5C;
+    font-size: 14px;
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.student_user_email {
+    font-size: 12px;
+    color: #6B7280;
+    margin: 4px 0 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.student_dropdown_item {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    background: white;
+    color: #003D5C;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.student_dropdown_item:hover {
+    background: #E6F7FF;
+}
+
+.student_dropdown_item.logout {
+    color: #FF4757;
+    border-top: 1px solid #E5E7EB;
+}
+
+.student_dropdown_item.logout:hover {
+    background: #FFE5E8;
+}
+
+@media (max_width: 640px) {
+    .student_navbar_content {
+        padding: 12px 16px;
+    }
+
+    .student_logo_emoji {
+        font-size: 24px;
+    }
+
+    .student_logo_text h1 {
+        font-size: 18px;
+    }
+
+    .student_logo_text p {
+        font-size: 10px;
+    }
+
+    .student_profile_label {
+        display: none;
+    }
+
+    .student_profile_btn {
+        padding: 6px;
+        gap: 0;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+    }
+
+    .student_profile_icon {
+        width: 24px;
+        height: 24px;
+        background: transparent;
+    }
+
+    .student_arrow {
+        display: none;
+    }
+}
+
+@keyframes studentSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

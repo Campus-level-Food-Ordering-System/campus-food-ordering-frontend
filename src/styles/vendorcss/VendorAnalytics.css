@@ -1,0 +1,147 @@
+.vendor_analytics {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.analytics_header {
+    margin-bottom: 2rem;
+}
+
+.analytics_header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 0.5rem 0;
+}
+
+.analytics_subtitle {
+    font-size: 0.95rem;
+    color: #999;
+    margin: 0;
+}
+
+/* Analytics Grid */
+.analytics_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Analytics Card */
+.analytics_card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.analytics_card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.analytics_icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.analytics_content {
+    flex: 1;
+}
+
+.analytics_label {
+    font-size: 0.9rem;
+    color: #999;
+    margin: 0 0 0.5rem 0;
+}
+
+.analytics_value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+}
+
+/* Chart Placeholder */
+.analytics_chart_placeholder {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.analytics_chart_placeholder h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 2rem 0;
+}
+
+.chart_mock {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 250px;
+    gap: 1rem;
+}
+
+.chart_bar {
+    flex: 1;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.chart_bar:hover {
+    opacity: 0.8;
+    transform: translateY(-5px);
+}
+
+.chart_bar span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    position: absolute;
+    bottom: -25px;
+    color: #666;
+}
+
+/* Responsive */
+@media (max_width: 768px) {
+    .analytics_grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart_mock {
+        height: 200px;
+    }
+}
+
+

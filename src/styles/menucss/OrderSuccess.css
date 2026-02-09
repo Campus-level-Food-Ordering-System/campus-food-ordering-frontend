@@ -1,0 +1,433 @@
+﻿/* Success Overlay */
+.success_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    padding: 1.5rem;
+}
+
+/* Modal */
+.success_modal {
+    background-color: white;
+    width: 100%;
+    max-width: 30rem;
+    border-radius: 2.5rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    position: relative;
+    animation: pop_in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pop_in {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.close_success_btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: none;
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+}
+
+/* Body */
+.success_body {
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+/* Success Animation */
+.success_animation_wrapper {
+    position: relative;
+    width: 8rem;
+    height: 8rem;
+    margin: 0 auto 1.5rem;
+    animation: bounce_in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes bounce_in {
+    0% {
+        transform: scale(0);
+    }
+
+    60% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.check_ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 4px solid #FF5E4D;
+    background-color: transparent;
+    opacity: 0;
+    animation: ring_spread 0.8s ease-out forwards;
+    animation-delay: 0.2s;
+}
+
+@keyframes ring_spread {
+    0% {
+        transform: scale(0.1);
+        opacity: 1;
+        border-width: 10px;
+    }
+
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+        border-width: 1px;
+    }
+}
+
+.checkmark_svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 4px 12px rgba(255, 94, 77, 0.2));
+}
+
+.checkmark_circle_bg {
+    stroke-width: 0;
+    fill: #FF5E4D;
+    transform-origin: center;
+    animation: fill_circle 0.4s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+@keyframes fill_circle {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.checkmark_check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    stroke-width: 5;
+    stroke: white;
+    /* Contrast against orange circle */
+    stroke-linecap: round;
+    animation: stroke_draw 0.5s cubic-bezier(0.65, 0, 0.45, 1) 0.4s forwards;
+}
+
+@keyframes stroke_draw {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+.success_title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.order_id_text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+/* Info Card */
+.collection_info_card {
+    background-color: #f9fafb;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.info_row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+}
+
+.info_icon {
+    color: #FF5E4D;
+}
+
+.info_text_group {
+    display: flex;
+    flex-direction: column;
+}
+
+.info_label {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.info_value {
+    font-weight: 700;
+    color: #111827;
+}
+
+/* QR Section */
+.qr_section {
+    padding: 2rem;
+    background-color: white;
+    border: 2px solid #f3f4f6;
+    border-radius: 2rem;
+    margin-bottom: 2rem;
+}
+
+.qr_container {
+    display: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.qr_mock {
+    position: relative;
+    padding: 1rem;
+    background: white;
+}
+
+.qr_scan_line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #FF5E4D, transparent);
+    box-shadow: 0 0 8px rgba(255, 94, 77, 0.5);
+    animation: scan_anim 2.5s infinite linear;
+}
+
+@keyframes scan_anim {
+    0% {
+        top: 0;
+    }
+
+    100% {
+        top: 100%;
+    }
+}
+
+.qr_instruction {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Summary Mini */
+.order_summary_mini {
+    text-align: left;
+    border-top: 1px dashed #e5e7eb;
+    padding-top: 1.5rem;
+}
+
+.summary_header {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.mini_item_list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.mini_item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.mini_total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #111827;
+    font-size: 1rem;
+}
+
+.mini_total span:last-child {
+    color: #FF5E4D;
+}
+
+.success_footer {
+    padding: 1rem 2rem 2.5rem;
+}
+
+.done_btn {
+    width: 100%;
+    background-color: #FF5E4D;
+    color: white;
+    font-weight: 700;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.done_btn:hover {
+    background-color: #db4231;
+    transform: translateY(-2px);
+}
+
+/* Additional classes for OrderDetailsModal */
+.success_info_card {
+    background-color: #f9fafb;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.info_text {
+    display: flex;
+    flex-direction: column;
+}
+
+.qr_text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+    text-align: center;
+}
+
+.mini_list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.order_id {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.cancel_btn {
+    width: 100%;
+    background-color: #f3f4f6;
+    color: #6b7280;
+    font-weight: 600;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.cancel_btn:hover {
+    background-color: #e5e7eb;
+}
+
+.cancel_order_trigger {
+    margin-bottom: 0.75rem;
+}
+
+.cancel_confirm_box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.cancel_confirm_box textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.cancel_confirm_box textarea:focus {
+    outline: none;
+    border-color: #FF5E4D;
+}
+
+/* Order Cancellation Banner */
+.order_cancellation_banner {
+    background: #fef2f2;
+    border: 1.5px solid #fecaca;
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+.cancellation_header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #dc2626;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.cancellation_reason {
+    color: #991b1b;
+    font-size: 0.875rem;
+    margin: 0.5rem 0;
+}
+
+.cancellation_meta {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-style: italic;
+}

@@ -1,13 +1,13 @@
 :root {
   --background: #ffffff;
-  --primary-blue: #0077BE;
-  --secondary-blue: #00A8E8;
-  --admin-dark: #003D5C;
-  --text-main: #003D5C;
-  --text-muted: #6B7280;
-  --border-color: #E5E7EB;
-  --error-red: #FF4757;
-  --success-bg: #E6F7FF;
+  --primary_blue: #0077BE;
+  --secondary_blue: #00A8E8;
+  --admin_dark: #003D5C;
+  --text_main: #003D5C;
+  --text_muted: #6B7280;
+  --border_color: #E5E7EB;
+  --error_red: #FF4757;
+  --success_bg: #E6F7FF;
 }
 body {
   margin: 0;
@@ -23,3 +23,4 @@ button {
   border: none;
   background: none;
 }
+

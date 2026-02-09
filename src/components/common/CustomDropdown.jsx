@@ -33,31 +33,31 @@ const CustomDropdown = ({
     const selectedOption = options.find(opt => opt.value === value);
 
     return (
-        <div className="custom-dropdown-container" ref={dropdownRef}>
+        <div className="custom_dropdown_container" ref={dropdownRef}>
             <div
-                className={`custom-dropdown-trigger ${isOpen ? 'open' : ''} ${disabled ? 'disabled' : ''}`}
+                className={`custom_dropdown_trigger ${isOpen ? 'open' : ''} ${disabled ? 'disabled' : ''}`}
                 onClick={() => !disabled && setIsOpen(!isOpen)}
             >
-                <span className={`trigger-text ${!selectedOption ? 'placeholder' : ''}`}>
+                <span className={`trigger_text ${!selectedOption ? 'placeholder' : ''}`}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
-                <ChevronDown size={20} className="trigger-arrow" />
+                <ChevronDown size={20} className="trigger_arrow" />
             </div>
 
             {isOpen && !disabled && (
-                <div className="custom-dropdown-menu">
+                <div className="custom_dropdown_menu">
                     {options.length > 0 ? (
                         options.map((option) => (
                             <div
                                 key={option.value}
-                                className={`dropdown-item ${value === option.value ? 'selected' : ''}`}
+                                className={`dropdown_item ${value === option.value ? 'selected' : ''}`}
                                 onClick={() => handleSelect(option.value)}
                             >
                                 {option.label}
                             </div>
                         ))
                     ) : (
-                        <div className="dropdown-item" style={{ textAlign: 'center', color: '#9CA3AF', cursor: 'default' }}>
+                        <div className="dropdown_item" style={{ textAlign: 'center', color: '#9CA3AF', cursor: 'default' }}>
                             No options available
                         </div>
                     )}

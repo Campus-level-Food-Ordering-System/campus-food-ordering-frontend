@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock } from 'lucide-react';
-import AuthLayout from './AuthLayout';
 import '../../styles/authcss/SignIn.css';
 
 export default function ChangePassword() {
@@ -23,37 +22,37 @@ export default function ChangePassword() {
   };
 
   return (
-    <AuthLayout>
-      <div className="auth-header">
+    <>
+      <div className="auth_header">
         <h2>Reset Password 🔒</h2>
         <p>Create a strong new password</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="form-group">
+      <form onSubmit={handleSubmit} className="auth_form">
+        <div className="form_group">
           <label><Lock size={16} /> New Password</label>
           <input
             type="password"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required className="form-input"
+            required className="form_input"
           />
         </div>
-        <div className="form-group">
+        <div className="form_group">
           <label><Lock size={16} /> Confirm Password</label>
           <input
             type="password"
             placeholder="••••••••"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            required className="form-input"
+            required className="form_input"
           />
         </div>
-        <button type="submit" className="submit-btn" disabled={isLoading}>
+        <button type="submit" className="submit_btn" disabled={isLoading}>
           {isLoading ? 'Updating...' : 'Update Password'}
         </button>
       </form>
-    </AuthLayout>
+    </>
   );
 }

@@ -1,0 +1,58 @@
+.student_dashboard_container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #E6F7FF 0%, #ffffff 100%);
+    padding-top: 5rem;
+    /* Space for the fixed navbar */
+}
+
+.student_dashboard_main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.student_welcome_banner {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 24px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.student_welcome_banner h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #003D5C;
+    margin: 0 0 8px 0;
+}
+
+.student_welcome_banner p {
+    font-size: 16px;
+    color: #6B7280;
+    margin: 0;
+}
+
+.student_shops_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+@media (max_width: 768px) {
+    .student_dashboard_main {
+        padding: 24px 16px;
+    }
+
+    .student_welcome_banner h2 {
+        font-size: 24px;
+    }
+
+    .student_welcome_banner p {
+        font-size: 14px;
+    }
+
+    .student_shops_grid {
+        grid-template-columns: 1fr;
+    }
+}

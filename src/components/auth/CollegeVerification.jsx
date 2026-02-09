@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Building2, Calendar } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; // Import Auth
-import AuthLayout from './AuthLayout';
 import CustomDropdown from '../common/CustomDropdown';
 import '../../styles/authcss/SignIn.css';
 
@@ -86,16 +85,16 @@ export default function CollegeVerification() {
         : [];
 
   return (
-    <AuthLayout>
-      <div className="auth-header" style={{ textAlign: 'center' }}>
+    <>
+      <div className="auth_header" style={{ textAlign: 'center' }}>
         <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎓</div>
         <h2>College Profile</h2>
         <p>Complete your academic details</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="form-group">
-          <label><Building2 size={16} /> College Name</label>
+      <form onSubmit={handleSubmit} className="auth_form">
+        <div className="form_group">
+          <label>College Name</label>
           <CustomDropdown
             placeholder="Select College"
             options={collegeOptions}
@@ -104,8 +103,8 @@ export default function CollegeVerification() {
           />
         </div>
 
-        <div className="form-group">
-          <label><GraduationCap size={16} /> Department</label>
+        <div className="form_group">
+          <label>Department</label>
           <CustomDropdown
             placeholder="Select Department"
             options={departmentOptions}
@@ -115,8 +114,8 @@ export default function CollegeVerification() {
           />
         </div>
 
-        <div className="form-group">
-          <label><Calendar size={16} /> Year of Study</label>
+        <div className="form_group">
+          <label>Year of Study</label>
           <CustomDropdown
             placeholder="Select Year"
             options={yearOptions}
@@ -126,10 +125,10 @@ export default function CollegeVerification() {
           />
         </div>
 
-        <button type="submit" className="submit-btn" disabled={isLoading}>
+        <button type="submit" className="submit_btn" disabled={isLoading}>
           {isLoading ? 'Saving...' : 'Complete Profile'}
         </button>
       </form>
-    </AuthLayout>
+    </>
   );
 }
