@@ -1,281 +1,316 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-    Camera,
-    Pencil,
-    MapPin,
-    GraduationCap,
-    BookOpen,
-    Heart,
-    Utensils,
-    Pizza,
-    Beef,
-    Filter,
-    Book,
-    Monitor,
-    Coffee,
-    Shirt,
-    ChevronRight,
-    MessageSquare,
-    ArrowLeft
+    Camera, MapPin, Heart, Utensils, Pizza, Filter,
+    Coffee, ArrowLeft, Edit2, X, Save, ShoppingBag, CheckCircle, ChevronDown
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import { useAuth } from '../context/AuthContext';
 import coverImg from '../assets/profile-cover.png';
 import avatarImg from '../assets/avatar.png';
-
 import '../styles/profilecss/Profile.css';
 
-const StatsCards = ({ isMobileView = false }) => (
-    <div className={`${isMobileView
-        ? "flex flex-col gap-3 mx-4"
-        : "grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
-        }`}>
-        {/* Card 1: Campus */}
-        <div className={`flex items-center gap-4 ${isMobileView ? "p-0" : "bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"}`}>
-            <div className={`p-2.5 rounded-lg flex-shrink-0 ${isMobileView ? "bg-indigo-100 text-indigo-600" : "bg-indigo-50 text-indigo-600"}`}>
-                <MapPin className="w-5 h-5" />
-            </div>
-            <div>
-                {!isMobileView && <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Campus</p>}
-                <p className="text-sm font-semibold text-gray-900 truncate">SKCT Main</p>
-            </div>
-        </div>
-
-        {/* Card 2: Fav Location */}
-        <div className={`flex items-center gap-4 ${isMobileView ? "p-0" : "bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"}`}>
-            <div className={`p-2.5 rounded-lg flex-shrink-0 ${isMobileView ? "bg-blue-100 text-blue-600" : "bg-blue-50 text-blue-600"}`}>
-                <Heart className="w-5 h-5" />
-            </div>
-            <div>
-                {!isMobileView && <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Favourite Location</p>}
-                <p className="text-sm font-semibold text-gray-900 truncate">Main Block Chat Coffee</p>
-            </div>
-        </div>
-
-        {/* Card 3: Fav Food */}
-        <div className={`flex items-center gap-4 ${isMobileView ? "p-0" : "bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"}`}>
-            <div className={`p-2.5 rounded-lg flex-shrink-0 ${isMobileView ? "bg-purple-100 text-purple-600" : "bg-purple-50 text-purple-600"}`}>
-                <Utensils className="w-5 h-5" />
-            </div>
-            <div>
-                {!isMobileView && <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Favorite Food</p>}
-                <p className="text-sm font-semibold text-gray-900 truncate">Chicken Burger</p>
-            </div>
-        </div>
-    </div>
-);
+// --- MOCK DATA ---
+const INITIAL_ORDERS = [
+    { id: 1, name: "Chicken Burger", shop: "Main Block Chat", date: "Oct 24, 2025", status: "Delivered", price: "₹120.00", icon: Utensils, statusColor: "green" },
+    { id: 2, name: "Paneer Pizza", shop: "Campus Pizza Corner", date: "Oct 12, 2025", status: "Delivering", price: "₹210.00", icon: Pizza, statusColor: "blue" },
+    { id: 3, name: "Masala Chai", shop: "Main Block Chat", date: "Sep 30, 2025", status: "Preparing", price: "₹35.00", icon: Coffee, statusColor: "orange" },
+    { id: 4, name: "Club Sandwich", shop: "Library Cafe", date: "Aug 15, 2025", status: "Delivered", price: "₹90.00", icon: Utensils, statusColor: "green" },
+    { id: 5, name: "Veg Momos", shop: "Main Block Chat", date: "Aug 10, 2025", status: "Delivered", price: "₹80.00", icon: Utensils, statusColor: "green" },
+    { id: 6, name: "Cold Coffee", shop: "Library Cafe", date: "Aug 05, 2025", status: "Cancelled", price: "₹60.00", icon: Coffee, statusColor: "red" },
+    { id: 7, name: "Chicken Burger", shop: "Main Block Chat", date: "Jul 28, 2025", status: "Delivered", price: "₹120.00", icon: Utensils, statusColor: "green" },
+];
 
 export default function Profile() {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [showAllOrders, setShowAllOrders] = useState(false);
+    const fileInputRef = useRef(null);
+    
+    // --- STATE ---
+    const [orders, setOrders] = useState(INITIAL_ORDERS);
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [filterType, setFilterType] = useState('All');
+    const [toastMsg, setToastMsg] = useState(null);
+    const [visibleCount, setVisibleCount] = useState(4);
 
-    // Sample Orders Data
-    const initialOrders = [
-        { id: 1, name: "Chicken Burger", date: "Oct 24, 2025", status: "Delivered", price: "₹120.00", icon: Utensils, statusColor: "green" },
-        { id: 2, name: "Paneer Pizza", date: "Oct 12, 2025", status: "Delivering", price: "₹210.00", icon: Pizza, statusColor: "blue" },
-        { id: 3, name: "Masala Chai", date: "Sep 30, 2025", status: "Preparing", price: "₹35.00", icon: Coffee, statusColor: "orange" },
-        { id: 4, name: "Club Sandwich", date: "Aug 15, 2025", status: "Delivered", price: "₹90.00", icon: Utensils, statusColor: "green" },
-    ];
+    const [profileData, setProfileData] = useState({
+        name: user?.name || "Vindhan",
+        email: user?.email || "studentuser1@skct.edu.in",
+        role: user?.role || "Student",
+        college: user?.college || "Sri Krishna College of Tech",
+        id: "727823TUCS034",
+        department: "CSE-A",
+        year: "III Year"
+    });
 
-    const extraOrders = [
-        { id: 5, name: "Veg Momos", date: "Aug 10, 2025", status: "Delivered", price: "₹80.00", icon: Utensils, statusColor: "green" },
-        { id: 6, name: "Cold Coffee", date: "Aug 05, 2025", status: "Cancelled", price: "₹60.00", icon: Coffee, statusColor: "red" },
-        { id: 7, name: "French Fries", date: "Jul 28, 2025", status: "Delivered", price: "₹95.00", icon: Utensils, statusColor: "green" },
-    ];
+    // --- HANDLERS ---
+    const handleSaveProfile = (newData) => {
+        setProfileData(newData);
+        setToastMsg("Profile updated successfully!");
+        setTimeout(() => setToastMsg(null), 3000);
+    };
 
-    const displayedOrders = showAllOrders ? [...initialOrders, ...extraOrders] : initialOrders;
+    const handleImageClick = () => fileInputRef.current.click();
+    const handleFileChange = (e) => {
+        if (e.target.files[0]) {
+             setToastMsg("Profile picture updated!");
+             setTimeout(() => setToastMsg(null), 3000);
+        }
+    };
 
-    const displayName = user?.name || user?.email?.split('@')[0] || "Vindhan";
-    const displayEmail = "studentuser1@skct";
-    const displayRole = user?.role || "Published";
-    const displayCollege = user?.college || "Sri Krishna College of Tech";
-    const displayDept = user?.department || "CSE-A";
-    const displayYear = user?.year || "2023-27 (III Year)"
+    // --- MEMOIZED CALCULATIONS ---
+    const { favFood, favLocation } = useMemo(() => {
+        if (!orders || orders.length === 0) return { favFood: "N/A", favLocation: "N/A" };
+        const getMostFrequent = (arr, key) => {
+            const counts = arr.reduce((acc, item) => { acc[item[key]] = (acc[item[key]] || 0) + 1; return acc; }, {});
+            if (Object.keys(counts).length === 0) return "N/A";
+            return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+        };
+        return { favFood: getMostFrequent(orders, 'name'), favLocation: getMostFrequent(orders, 'shop') };
+    }, [orders]);
+
+    const visibleOrders = useMemo(() => {
+        const filtered = filterType === 'All' ? orders : orders.filter(o => o.status === filterType);
+        return filtered.slice(0, visibleCount);
+    }, [orders, filterType, visibleCount]);
+
+    const hasMoreOrders = visibleOrders.length < (filterType === 'All' ? orders.length : orders.filter(o => o.status === filterType).length);
 
     return (
-        <div className="bg-gray-50 min-h-screen text-slate-800">
+        <div className="profile-container">
             <NavBar />
+            
+            {toastMsg && (
+                <div className="fixed top-24 right-5 z-50 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-left">
+                    <CheckCircle className="text-green-400 w-5 h-5" />
+                    <span className="text-sm font-medium">{toastMsg}</span>
+                </div>
+            )}
 
-            {/* Top Banner (Food Spread Panorama) */}
-            <div className="relative h-80 w-full overflow-hidden bg-gray-200">
-                <img src={coverImg} alt="Cover" className="w-full h-full object-cover object-center animate-fade-in" />
-                {/* Overlay for better readability */}
-                <div className="absolute inset-0 bg-black/20"></div>
-                <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+            <EditProfileModal 
+                isOpen={isEditOpen} 
+                onClose={() => setIsEditOpen(false)} 
+                userData={profileData}
+                onSave={handleSaveProfile}
+            />
 
-                {/* Back Button Overlay */}
-                <button
-                    onClick={() => navigate('/dashboard')}
-                    className="absolute top-6 left-6 p-2 bg-orange-500 hover:bg-orange-600 backdrop-blur-md rounded-full text-white transition-all z-20 hover:scale-110 active:scale-95"
-                >
+            <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+
+            {/* Banner */}
+            <div className="profile-banner">
+                <img src={coverImg} alt="Cover" className="banner-img animate-fade-in" />
+                <div className="banner-overlay"></div>
+                <div className="banner-gradient"></div>
+                <button onClick={() => navigate('/dashboard')} className="back-btn">
                     <ArrowLeft size={24} />
                 </button>
             </div>
 
-            {/* Main Content Container --> */}
-            <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-40 pb-12">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Main Content */}
+            <main className="profile-main">
+                <div className="profile-grid">
 
-                    {/* Left Sidebar: Profile Card */}
-                    <div className="lg:col-span-4 space-y-6">
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden profile-sidebar-card">
+                    {/* Left Sidebar */}
+                    <div className="profile-sidebar-col">
+                        <div className="sidebar-card profile-sidebar-card">
+                            <button onClick={() => setIsEditOpen(true)} className="edit-icon-btn">
+                                <Edit2 size={18} />
+                            </button>
+
                             <div className="p-6 flex flex-col items-center pt-10">
-                                {/* Profile Image */}
-                                <div className="relative group cursor-pointer animate-profile-img">
-                                    <div className="h-28 w-28 rounded-full ring-4 ring-white shadow-md overflow-hidden bg-gray-900">
-                                        <img src={avatarImg} alt="Profile" className="h-full w-full object-cover opacity-90 hover:opacity-100 transition-opacity" />
+                                <div onClick={handleImageClick} className="avatar-wrapper animate-profile-img">
+                                    <div className="avatar-ring">
+                                        <img src={avatarImg} alt="Profile" className="avatar-img" />
                                     </div>
-                                    <div className="absolute bottom-1 right-1 bg-orange-500 text-white p-1.5 rounded-full shadow-sm border-2 border-white transform transition-transform group-hover:scale-110">
+                                    <div className="camera-badge">
                                         <Camera className="w-3.5 h-3.5" />
                                     </div>
                                 </div>
 
-                                {/* Name & Status */}
-                                <h1 className="mt-5 text-2xl font-semibold tracking-tight text-gray-900">{displayName}</h1>
-                                <span className="mt-2 inline-flex items-center rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-medium text-orange-600 ring-1 ring-inset ring-orange-500/10">
-                                    {displayRole === 'vendor' ? 'Shop Owner' : 'Student'}
-                                </span>
+                                <h1 className="profile-name">{profileData.name}</h1>
+                                <span className="profile-role-badge">{profileData.role}</span>
 
                                 <div className="w-full mt-8 lg:hidden">
-                                    <StatsCards isMobileView={true} />
+                                    <StatsCards isMobileView={true} campus={profileData.college} favLocation={favLocation} favFood={favFood} />
                                 </div>
-
-                                <div className="w-10 h-1 bg-gray-100 rounded-full mt-6 mb-2"></div>
+                                <div className="divider"></div>
                             </div>
 
-                            {/* Personal Information List */}
-                            <div className="px-6 pb-8">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-base font-medium text-gray-900">Personal Information</h2>
-
-                                </div>
-
-                                <div className="space-y-5">
-                                    {/* ID */}
-                                    <div className="flex justify-between items-center group">
-                                        <span className="text-sm text-gray-500 font-normal">ID</span>
-                                        <span className="text-base font-medium text-gray-800">727823TUCS034</span>
-                                    </div>
-
-                                    {/* Username */}
-                                    <div className="flex justify-between items-center group">
-                                        <span className="text-sm text-gray-500 font-normal">Username</span>
-                                        <span className="text-base font-medium text-gray-800">@daanish_m</span>
-                                    </div>
-
-                                    {/* Email */}
-                                    <div className="flex justify-between items-start group">
-                                        <span className="text-sm text-gray-500 font-normal mt-1">Email</span>
-                                        <span className="text-base font-medium text-gray-800 text-right truncate max-w-[12rem]">{displayEmail}</span>
-                                    </div>
-
-                                    {/* College Name */}
-                                    <div className="flex justify-between items-start group">
-                                        <span className="text-sm text-gray-500 font-normal mt-1">College</span>
-                                        <span className="text-base font-medium text-gray-800 text-right">{displayCollege}</span>
-                                    </div>
-
-                                    {/* Department */}
-                                    <div className="flex justify-between items-center group">
-                                        <span className="text-sm text-gray-500 font-normal">Department</span>
-                                        <span className="text-base font-medium text-gray-800">{displayDept}</span>
-                                    </div>
-
-                                    {/* Year of Study */}
-                                    <div className="flex justify-between items-center group">
-                                        <span className="text-sm text-gray-500 font-normal">Year Of Study</span>
-                                        <span className="text-base font-medium text-gray-800">{displayYear}</span>
-                                    </div>
-                                </div>
+                            <div className="info-list">
+                                <ProfileRow label="ID" value={profileData.id} />
+                                <ProfileRow label="Email" value={profileData.email} truncate />
+                                <ProfileRow label="College" value={profileData.college} />
+                                <ProfileRow label="Department" value={profileData.department} />
+                                <ProfileRow label="Year" value={profileData.year} />
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Content: Dashboard/Orders */}
-                    <div className="lg:col-span-8 pt-10 lg:pt-0">
-
-                        {/* Desktop Only: Quick Stats Cards */}
+                    {/* Right Content */}
+                    <div className="profile-content-col">
                         <div className="hidden lg:block">
-                            <StatsCards />
+                            <StatsCards campus={profileData.college} favLocation={favLocation} favFood={favFood} />
                         </div>
 
-
-
-                        {/* My Orders Section */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden orders-section">
-                            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
-                                <div className="flex items-center gap-4">
-                                    <nav className="flex p-1 bg-white/60 backdrop-blur-md border border-white/50 rounded-full shadow-sm" aria-label="Tabs">
-                                        <div className="bg-white/90 text-orange-500 whitespace-nowrap py-1.5 px-8 text-sm font-bold rounded-full shadow-sm border border-orange-50">
-                                            MY ORDERS
-                                        </div>
-                                    </nav>
+                        {/* Orders Section */}
+                        <div className="orders-card orders-section">
+                            <div className="orders-header">
+                                <div className="orders-title">
+                                    <ShoppingBag size={20} />
+                                    <span>MY ORDERS</span>
                                 </div>
-                                <button className="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-all">
-                                    <Filter className="w-5 h-5" />
-                                </button>
+                                <div className="relative">
+                                    <button 
+                                        onClick={() => setIsFilterOpen(!isFilterOpen)} 
+                                        className={`filter-btn ${isFilterOpen ? 'active' : 'inactive'}`}
+                                    >
+                                        <span>{filterType !== 'All' ? filterType : 'Filter'}</span>
+                                        <Filter className="w-5 h-5" />
+                                    </button>
+                                    
+                                    {isFilterOpen && (
+                                        <>
+                                            <div className="fixed inset-0 z-10" onClick={() => setIsFilterOpen(false)}></div>
+                                            <div className="dropdown-menu animate-scale-up-origin-tr">
+                                                {['All', 'Delivered', 'Delivering', 'Preparing', 'Cancelled'].map((status) => (
+                                                    <button 
+                                                        key={status} 
+                                                        onClick={() => { setFilterType(status); setVisibleCount(4); setIsFilterOpen(false); }} 
+                                                        className={`dropdown-item ${filterType === status ? 'selected' : 'default'}`}
+                                                    >
+                                                        {status}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
 
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
+                            <div className="overflow-x-auto flex-1">
+                                <table className="orders-table">
                                     <thead>
-                                        <tr className="bg-slate-50 border-b border-gray-100">
-                                            <th className="py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                                            <th className="py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                            <th className="py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                            <th className="py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">Total</th>
-                                            <th className="py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Shop</th>
+                                            <th>Status</th>
+                                            <th className="text-right">Total</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {displayedOrders.map((order) => (
-                                            <tr key={order.id} className="hover:bg-gray-50/50 transition-colors group">
-                                                <td className="py-4 px-6 text-base text-gray-600">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-8 w-8 rounded bg-gray-100 flex items-center justify-center text-gray-400">
-                                                            <order.icon className="w-4 h-4" />
+                                    <tbody>
+                                        {visibleOrders.length > 0 ? (
+                                            visibleOrders.map((order) => (
+                                                <tr key={order.id} className="table-row">
+                                                    <td className="product-cell">
+                                                        <div className="product-icon"><order.icon className="w-4 h-4" /></div>
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium text-gray-800">{order.name}</span>
+                                                            <span className="text-xs text-gray-400 md:hidden">{order.date}</span>
                                                         </div>
-                                                        <span>{order.name}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-6 text-base text-gray-500">{order.date}</td>
-                                                <td className="py-4 px-6">
-                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset 
-                                                        ${order.statusColor === 'green' ? 'bg-green-50 text-green-700 ring-green-600/20' :
-                                                            order.statusColor === 'blue' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
-                                                                order.statusColor === 'orange' ? 'bg-orange-100 text-orange-600 ring-orange-500/20' :
-                                                                    'bg-red-50 text-red-700 ring-red-600/20'}`}>
-                                                        {order.status}
-                                                    </span>
-                                                </td>
-                                                <td className="py-4 px-6 text-base text-gray-900 font-medium text-right">{order.price}</td>
-                                                <td className="py-4 px-6 text-right">
-                                                    <button className="text-gray-400 hover:text-orange-500 transition-colors">
-                                                        <ChevronRight className="w-5 h-5" />
-                                                    </button>
-                                                </td>
+                                                    </td>
+                                                    <td className="text-sm text-gray-500">
+                                                        <div className="flex flex-col">
+                                                            <span>{order.shop}</span>
+                                                            <span className="text-xs text-gray-400 hidden md:block">{order.date}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span className={`status-badge ${order.statusColor}`}>
+                                                            {order.status}
+                                                        </span>
+                                                    </td>
+                                                    <td className="text-base font-medium text-right">{order.price}</td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="4" className="py-10 text-center text-gray-400 italic">No orders found.</td>
                                             </tr>
-                                        ))}
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
 
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                                <span className="text-sm text-gray-500">Showing {displayedOrders.length} recent orders</span>
-                                <button
-                                    onClick={() => setShowAllOrders(!showAllOrders)}
-                                    className="text-sm font-medium text-orange-500 hover:text-orange-600 focus:outline-none"
-                                >
-                                    {showAllOrders ? "Show less" : "View all"}
-                                </button>
-                            </div>
+                            {hasMoreOrders && (
+                                <div className="show-more-container">
+                                    <button onClick={() => setVisibleCount(prev => prev + 5)} className="show-more-btn">
+                                        Show More <ChevronDown size={16} />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
-                </div >
-            </main >
-
-        </div >
+                </div>
+            </main>
+        </div>
     );
 }
+
+// --- HELPER COMPONENTS ---
+const StatsCards = ({ isMobileView = false, campus, favLocation, favFood }) => (
+    <div className={isMobileView ? "flex flex-col gap-3 mx-4" : "stats-grid"}>
+        <StatCard icon={MapPin} label="Campus" value={campus} color="indigo" />
+        <StatCard icon={Heart} label="Favorite Spot" value={favLocation} color="blue" />
+        <StatCard icon={Utensils} label="Go-To Meal" value={favFood} color="purple" />
+    </div>
+);
+
+const StatCard = ({ icon: Icon, label, value, color }) => (
+    <div className="stat-card">
+        <div className={`stat-icon ${color}`}>
+            <Icon className="w-5 h-5" />
+        </div>
+        <div>
+            <p className="stat-label">{label}</p>
+            <p className="stat-value">{value}</p>
+        </div>
+    </div>
+);
+
+const ProfileRow = ({ label, value, truncate = false }) => (
+    <div className="info-row">
+        <span className="info-label">{label}</span>
+        <span className={`info-value ${truncate ? 'truncate max-w-[12rem]' : ''}`}>{value}</span>
+    </div>
+);
+
+const EditProfileModal = ({ isOpen, onClose, userData, onSave }) => {
+    const [formData, setFormData] = useState(userData);
+    useEffect(() => { setFormData(userData) }, [userData]);
+    if (!isOpen) return null;
+    return (
+        <div className="modal-overlay animate-fade-in">
+            <div className="modal-content animate-scale-up">
+                <div className="modal-header">
+                    <h3 className="text-lg font-bold text-gray-800">Edit Profile</h3>
+                    <button onClick={onClose} className="modal-close"><X size={20} /></button>
+                </div>
+                <div className="modal-body">
+                    <InputField label="Display Name" value={formData.name} onChange={v => setFormData({...formData, name: v})} />
+                    <InputField label="Student ID" value={formData.id} onChange={v => setFormData({...formData, id: v})} />
+                    <div className="grid grid-cols-2 gap-4">
+                        <InputField label="Department" value={formData.department} onChange={v => setFormData({...formData, department: v})} />
+                        <div className="form-group">
+                            <label>Year</label>
+                            <select value={formData.year} onChange={(e) => setFormData({...formData, year: e.target.value})} className="form-input bg-white">
+                                <option>I Year</option><option>II Year</option><option>III Year</option><option>IV Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal-footer">
+                    <button onClick={onClose} className="btn-cancel">Cancel</button>
+                    <button onClick={() => { onSave(formData); onClose(); }} className="btn-save"><Save size={16} /> Save Changes</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const InputField = ({ label, value, onChange }) => (
+    <div className="form-group">
+        <label>{label}</label>
+        <input type="text" value={value} onChange={e => onChange(e.target.value)} className="form-input" />
+    </div>
+);
