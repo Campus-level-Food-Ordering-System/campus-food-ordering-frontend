@@ -26,7 +26,7 @@
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
   margin-top: 0;
 }
@@ -98,7 +98,8 @@
   }
 
   .menu-grid {
-    gap: 10px;
+    gap: 12px;
+    grid-template-columns: 1fr;
   }
 
   .menu-section {

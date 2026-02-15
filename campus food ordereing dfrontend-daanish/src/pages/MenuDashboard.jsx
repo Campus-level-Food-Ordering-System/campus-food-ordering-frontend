@@ -81,6 +81,7 @@ export default function MenuDashboard() {
                 <MenuCard 
                   key={item.id} 
                   {...item} 
+                  category={activeCategory}
                   onAdd={handleAddToCart} 
                 />
               ))
