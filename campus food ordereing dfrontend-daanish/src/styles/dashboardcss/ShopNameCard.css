@@ -1,0 +1,132 @@
+/* ShopNameCard.css */
+
+/* --- CARD CONTAINER & ZOOM LOGIC --- */
+.shop-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  height: 220px;
+  position: relative;
+}
+
+.shop-card-image-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.shop-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ZOOM EFFECT (Only if shop is open) */
+.shop-card:not(.closed-shop):hover .shop-card-image {
+  transform: scale(1.12);
+}
+
+/* --- THE BADGE (Matches your Screenshot exactly) --- */
+.status-indicator-pill {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: white;
+  padding: 6px 10px;
+  border-radius: 20px;
+  /* Fully rounded pill */
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-dot.online {
+  background-color: #22c55e;
+  /* Green for Live */
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+  /* Subtle Green Glow */
+}
+
+.status-dot.offline {
+  background-color: #ef4444;
+  /* Red for Closed */
+}
+
+.status-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #374151;
+  /* Dark Grey Text */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+/* --- CONTENT OVERLAY --- */
+.shop-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 15px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  pointer-events: none;
+}
+
+.shop-name {
+  color: white;
+  margin: 0;
+  font-size: 18px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* --- CLOSED STATE --- */
+.shop-card.closed-shop {
+  cursor: not-allowed;
+}
+
+.shop-card.closed-shop .shop-card-image {
+  filter: grayscale(100%);
+  opacity: 0.8;
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 640px) {
+  .shop-card {
+    height: 140px;
+    /* Reduced height for mobile */
+    border-radius: 10px;
+  }
+
+  .shop-name {
+    font-size: 15px;
+    /* Smaller text */
+  }
+
+  .shop-card-content {
+    padding: 12px 10px;
+    /* Smaller padding */
+  }
+
+  .status-indicator-pill {
+    top: 8px;
+    left: 8px;
+    padding: 4px 8px;
+  }
+
+  .status-text {
+    font-size: 10px;
+  }
+}

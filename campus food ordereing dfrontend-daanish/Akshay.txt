@@ -1,0 +1,201 @@
+shopcardcss (changes for diagonal):
+.shop-card {
+position: relative; /* Ensure the card is a positioning context */
+}
+
+
+.shop-status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6); 
+}
+-----------------
+
+.shop-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  /* Fix for Safari border-radius overflow */
+  transform: translateZ(0); 
+}
+
+.shop-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* --- IMAGE SECTION --- */
+.shop-card-image-wrapper {
+  position: relative; 
+  width: 100%;
+  height: 160px; 
+  background-color: #f3f4f6;
+}
+
+/* Mobile adjust: slightly shorter images on very small screens to save space */
+@media (max-width: 480px) {
+  .shop-card-image-wrapper {
+    height: 140px;
+  }
+}
+
+.shop-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- STATUS BADGE (Ribbon) --- */
+.shop-status-badge {
+  position: absolute;
+  top: 15px;
+  left: -35px;
+  width: 120px;
+  padding: 5px 0;
+  text-align: center;
+  transform: rotate(-45deg);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+  z-index: 10; 
+}
+
+.shop-status-badge.open { background-color: #22c55e; }
+.shop-status-badge.closed { background-color: #ef4444; }
+
+/* --- CONTENT SECTION --- */
+.shop-card-content {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-grow: 1;
+  background: #fff;
+}
+
+.shop-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.shop-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%; /* Prevents name from pushing rating off */
+}
+
+/* Rating Styles */
+/* .shop-rating {
+  display: flex;
+  align-items: center;
+  background-color: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  flex-shrink: 0;
+} */
+
+.star-icon {
+  color: #f59e0b;
+  margin-right: 4px;
+  font-size: 14px;
+}
+
+/* --- CLOSED SHOP LOGIC --- */
+.shop-card.closed-shop .shop-card-image {
+  filter: grayscale(100%);
+  opacity: 0.8;
+}
+
+.shop-card.closed-shop {
+  cursor: not-allowed;
+}
+
+.shop-card.closed-shop:hover {
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+-x-x-x-x-x-x-x-x-x-x-x-
+import React from 'react';
+import '../styles/dashboardcss/ShopNameCard.css';
+
+const ShopNameCard = ({ name, image, isOpen, onClick }) => {
+  return (
+    <div 
+      className={`shop-card ${!isOpen ? 'closed-shop' : ''}`}
+      onClick={isOpen ? onClick : undefined} 
+      style={{ cursor: isOpen ? 'pointer' : 'not-allowed' }}
+    > 
+      <div className="shop-card-image-wrapper">
+        <img src={image} alt={name} className="shop-card-image" />
+        
+        {/* Status Badge (Top Left Ribbon) */}
+        <div className={`shop-status-badge ${isOpen ? 'open' : 'closed'}`}>
+          {isOpen ? 'Open' : 'Closed'}
+        </div>
+      </div>
+
+      {/* Content Section (Name & Rating) - Now below the image */}
+      <div className="shop-card-content">
+        <div className="shop-info-row">
+            <h3 className="shop-name">{name}</h3>
+            
+            {/* Rating Badge */}
+            {/* <div className="shop-rating">
+                <span className="star-icon">★</span>
+                <span className="rating-value">{rating || 'N/A'}</span>
+            </div> */}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ShopNameCard;
+
+-----------------------------
+
+--> badge - need to select between 3 --> done
+--> grey out - need to select between 2 --> done
+--> ratings on shopnamecard. - done, said don't want, so no need.
+--> mobile responsive. - done
+
+--> card size. - need to be done --> done
+--> remove footer on dashboard. - done
+
+-------------------------------
+
+--> remove role header - done
+--> create menu page and connect with dashboard - done
+
+need to be done:
+--> shop name on menu page. -- done
+--> style menu card(color(design) and size).
+--> separate menu for separate shop. -- done
+--> retain on refresh / not.(in same pg , after moving to next shop and coming back)
+--> move hardcoded arrays -- done
