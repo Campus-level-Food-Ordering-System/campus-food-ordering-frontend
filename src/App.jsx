@@ -21,6 +21,7 @@ import OfflineMessage from './components/common/OfflineMessage';
 import VendorDashboard from './components/vendor/VendorDashboard';
 import AdminDashboard from './components/admin/AdminDashboard';
 
+
 export default function App() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
