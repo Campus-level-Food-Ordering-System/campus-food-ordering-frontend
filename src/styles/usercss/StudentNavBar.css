@@ -1,210 +1,345 @@
-.student_navbar_container {
-    background: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    position: fixed;
-    /* Changed from sticky to fixed */
-    top: 0;
-    left: 0;
-    /* Added to cover width correctly */
-    right: 0;
-    /* Added to cover width correctly */
-    z-index: 1000;
+.navbar-container {
+  background: #F9FAFB;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
 }
 
-.student_navbar_content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 16px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.navbar-content {
+  margin: 0 auto;
+  padding: 16px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* Logo */
-.student_logo_section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+/* Navbar Groups */
+.navbar-left,
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
 
-.student_logo_emoji {
-    font-size: 32px;
+/* Logo */
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.student_logo_text h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    color: #003D5C;
-    margin: 0;
-    line-height: 1.2;
+.logo-emoji {
+  font-size: 32px;
 }
 
-.student_logo_text p {
-    font-size: 12px;
-    color: #6B7280;
-    margin: 0;
+.logo-text h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  color: #F97316;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.logo-text p {
+  font-size: 12px;
+  color: #4B5563;
+  margin: 0;
+}
+
+/* Location Button (Left Side) */
+.location-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  padding: 6px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 200px;
+}
+
+.location-btn:hover {
+  border-color: #FF6347;
+  background: #FAFAFA;
+}
+
+.location-icon-box {
+  background: #F3F4F6;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4B5563;
+}
+
+.location-btn:hover .location-icon-box {
+  background: #FFF1EB;
+  color: #FF6347;
+}
+
+.location-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+  flex: 1;
+}
+
+.location-text span {
+  font-size: 11px;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.location-text small {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.location-arrow {
+  color: #9CA3AF;
+}
+
+/* Contact Button (Right Side) */
+.contact-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFF1EB;
+  /* Light Orange Tint */
+  color: #FF6347;
+  border: 1px solid #FF6347;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.contact-btn:hover {
+  background: #FF6347;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 99, 71, 0.2);
 }
 
 /* Profile Button */
-.student_profile_section {
-    position: relative;
-    z-index: 1001;
+.profile-section {
+  position: relative;
 }
 
-.student_profile_btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
-    background: linear-gradient(135deg, #0077BE, #00A8E8);
-    color: white;
-    border-radius: 99px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s;
+.profile-actions {
+  display: flex;
+  align-items: center;
+  background: #FF6347;
+  /* Tomato instead of Light Orange */
+  border-radius: 30px;
+  padding: 4px;
+  gap: 4px;
+  transition: all 0.3s;
 }
 
-.student_profile_btn:hover {
-    box-shadow: 0 4px 12px rgba(0, 119, 190, 0.3);
+.profile-actions:hover {
+  box-shadow: 0 4px 12px rgba(255, 99, 71, 0.4);
 }
 
-.student_profile_icon {
-    width: 32px;
-    height: 32px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.profile-pic-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #FF6347;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.student_profile_label {
-    font-weight: 500;
-    font-size: 14px;
+.profile-pic-btn:hover {
+  transform: scale(1.1);
+}
+
+.navbar-profile-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px 0 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #111827;
+  height: 40px;
+}
+
+.profile-icon {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
 }
 
 /* Dropdown */
-.student_arrow {
-    transition: transform 0.3s;
+.arrow {
+  transition: transform 0.2s ease;
+  color: white;
 }
 
-.student_arrow.rotate {
-    transform: rotate(180deg);
+.arrow.rotate {
+  transform: rotate(180deg);
 }
 
-.student_profile_dropdown {
-    position: absolute;
-    right: 0;
-    margin-top: 8px;
-    width: 220px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border: 1px solid #E5E7EB;
-    overflow: hidden;
-    animation: studentSlideDown 0.2s ease-out;
-    z-index: 9999;
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  margin-top: 8px;
+  width: 220px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E5E7EB;
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
 }
 
-.student_dropdown_header {
-    padding: 16px;
-    border-bottom: 1px solid #E5E7EB;
-    background-color: #f9fafb;
+.dropdown-header {
+  padding: 16px;
+  border-bottom: 1px solid #E5E7EB;
+  background-color: #f9fafb;
 }
 
-.student_user_role {
-    font-weight: 600;
-    color: #003D5C;
-    font-size: 14px;
-    margin: 0;
-    text-transform: capitalize;
+.user-name {
+  font-weight: 700;
+  color: #111827;
+  font-size: 16px;
+  margin: 0 0 2px 0;
 }
 
-.student_user_email {
-    font-size: 12px;
-    color: #6B7280;
-    margin: 4px 0 0 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.user-role {
+  font-weight: 600;
+  color: #003D5C;
+  font-size: 14px;
+  margin: 0;
 }
 
-.student_dropdown_item {
-    width: 100%;
-    text-align: left;
+.user-email {
+  font-size: 12px;
+  color: #6B7280;
+  margin: 4px 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-item {
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  background: white;
+  color: #003D5C;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #E6F7FF;
+}
+
+.dropdown-item.logout {
+  color: #FF4757;
+  border-top: 1px solid #E5E7EB;
+}
+
+.dropdown-item.logout:hover {
+  background: #FFE5E8;
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 640px) {
+  .navbar-content {
     padding: 12px 16px;
-    background: white;
-    color: #003D5C;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
+    /* Smaller padding */
+  }
+
+  .logo-emoji {
+    font-size: 24px;
+    /* Smaller logo */
+  }
+
+  .logo-text h1 {
+    font-size: 18px;
+  }
+
+  .logo-text p {
+    font-size: 10px;
+  }
+
+  .profile-label {
+    display: none;
+  }
+
+  .profile-dropdown-btn {
+    padding: 0 8px;
+  }
+
+  .profile-actions {
+    padding: 2px;
+  }
+
+  .profile-pic-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .profile-dropdown-btn {
+    height: 32px;
+  }
+
+  .location-btn,
+  .contact-btn {
+    display: none;
+  }
 }
 
-.student_dropdown_item:hover {
-    background: #E6F7FF;
-}
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 
-.student_dropdown_item.logout {
-    color: #FF4757;
-    border-top: 1px solid #E5E7EB;
-}
-
-.student_dropdown_item.logout:hover {
-    background: #FFE5E8;
-}
-
-@media (max_width: 640px) {
-    .student_navbar_content {
-        padding: 12px 16px;
-    }
-
-    .student_logo_emoji {
-        font-size: 24px;
-    }
-
-    .student_logo_text h1 {
-        font-size: 18px;
-    }
-
-    .student_logo_text p {
-        font-size: 10px;
-    }
-
-    .student_profile_label {
-        display: none;
-    }
-
-    .student_profile_btn {
-        padding: 6px;
-        gap: 0;
-        width: 40px;
-        height: 40px;
-        justify-content: center;
-    }
-
-    .student_profile_icon {
-        width: 24px;
-        height: 24px;
-        background: transparent;
-    }
-
-    .student_arrow {
-        display: none;
-    }
-}
-
-@keyframes studentSlideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -6,22 +6,22 @@ const ShopNameCard = ({ name, image, isOpen, isActive, onClick }) => {
 
   return (
     <div
-      className={`shop_card ${!isAvailable ? 'closed_shop' : ''} ${!isActive ? 'admin-disabled' : ''}`}
+      className={`shop-card ${!isAvailable ? 'closed-shop' : ''} ${!isActive ? 'admin-disabled' : ''}`}
       onClick={isAvailable ? onClick : undefined}
     >
-      <div className="shop_card_image_wrapper">
-        <img src={image} alt={name} className="shop_card_image" draggable="false" />
+      <div className="shop-card-image-wrapper">
+        <img src={image} alt={name} className="shop-card-image" draggable="false" />
 
-        <div className="status_indicator_pill">
-          <span className={`status_dot ${isAvailable ? 'online' : 'offline'}`}></span>
-          <span className="status_text">
+        <div className="status-indicator-pill">
+          <span className={`status-dot ${isAvailable ? 'online' : 'offline'}`}></span>
+          <span className="status-text">
             {!isActive ? 'MAINTENANCE' : (isOpen ? 'LIVE' : 'CLOSED')}
           </span>
         </div>
       </div>
 
-      <div className="shop_card_content">
-        <h3 className="shop_name">{name}</h3>
+      <div className="shop-card-content">
+        <h3 className="shop-name">{name}</h3>
       </div>
     </div>
   );

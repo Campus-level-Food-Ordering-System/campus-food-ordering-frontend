@@ -375,6 +375,10 @@
   .sidebar_close_btn {
     display: none;
   }
+  .order_sidebar {
+    height: calc(100vh - 5rem);
+    padding-bottom: 1.5rem;
+  }
 }
 
 @media (max-width: 769px) {
@@ -384,27 +388,11 @@
 
   .order_sidebar {
     height: 100vh;
-    padding-bottom: 7rem;
+    padding-bottom: 2rem;
     /* Extra space for the floating round button */
   }
 
-  .sidebar_checkout_btn {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 400px;
-    border-radius: 99px;
-    /* Force round pill shape */
-    padding: 1.25rem;
-    box-shadow: 0 10px 30px rgba(255, 94, 77, 0.4);
-    z-index: 2500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
+  
 
   .sidebar_checkout_btn:hover:not(:disabled) {
     transform: translateX(-50%) translateY(-3px);

@@ -2,36 +2,52 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from './NavBar';
 import ShopNameCard from './ShopNameCard';
-import { useMenu } from '../../context/MenuContext';
-import '../../styles/usercss/StudentDashboard.css';
+// KEEP A's Context
+import { useMenu } from '../../context/MenuContext'; 
+// Use D's CSS (Ensure this file exists in your styles folder)
+import '../../styles/usercss/StudentDashboard.css'; 
 
 export default function Dashboard() {
     const navigate = useNavigate();
-    const { shops } = useMenu();
+    // KEEP A's Logic
+    const { shops } = useMenu(); 
 
     const handleShopClick = (shopId) => {
-        console.log("Navigating to shop:", shopId);
         navigate(`/menu/${shopId}`);
     };
 
     return (
-        <div className="student_dashboard_container">
+        // USE D's Layout Structure
+        <div className="dashboard-container">
+            <div className="animated-blobs">
+                <div className="blob blob-1"></div>
+                <div className="blob blob-2"></div>
+                <div className="blob blob-3"></div>
+                <div className="blob blob-4"></div>
+                <div className="blob blob-5"></div>
+                <div className="blob blob-6"></div>
+                <div className="blob blob-7"></div>
+                <div className="blob blob-8"></div>
+                <div className="blob blob-9"></div>
+            </div>
+            
             <NavBar />
 
-            <main className="student_dashboard_main">
-                <div className="student_welcome_banner">
-                    <h2>Welcome to CampusEats! 🎉</h2>
-                    <p>Choose your favorite shop to start ordering</p>
+            <main className="dashboard-main">
+                <div className="welcome-banner">
+                    <h2>Welcome to CampusEats!</h2>
+                    <p>Choose from a variety of shops to order your favorite food</p>
                 </div>
 
-                <div className="student_shops_grid">
+                <div className="shops-grid">
+                    {/* Map A's data to D's UI Components */}
                     {shops.map((shop) => (
                         <ShopNameCard
-                            key={shop.vendorId}
+                            key={shop.vendorId} // A uses vendorId
                             name={shop.name}
                             image={shop.image}
                             isOpen={shop.isOpen}
-                            isActive={shop.isActive}
+                            isActive={shop.isActive} // Keep A's extra props
                             onClick={() => handleShopClick(shop.vendorId)}
                         />
                     ))}

@@ -1,40 +1,37 @@
 import React from 'react';
-import '../../styles/menucss/CategoryToggle.css';
-
-const EMOJI_MAP = {
-  food: '🍕',
-  pizza: '🍕',
-  burger: '🍔',
-  mexican: '🌮',
-  asian: '🍱',
-  icecream: '🍦',
-  beverages: '🥤',
-  beverage: '🥤',
-  drinks: '🥤',
-  snacks: '🍿',
-  desserts: '🍰'
-};
+import '../../styles/menucss/CategoryToggle.css'; // Make sure this points to where D's slider CSS is
 
 const CategoryToggle = ({ activeCategory, setCategory, categories = [] }) => {
+  // Fallback to D's hardcoded list just in case A's array is empty
+  const displayCategories = categories.length > 0 
+    ? categories 
+    : [ { id: 'food', label: 'Food' }, { id: 'beverages', label: 'Beverages' } ];
+
+  // Find the index to calculate how far the background should slide
+  const activeIndex = displayCategories.findIndex(cat => cat.id === activeCategory);
+
   return (
-    <>
-      {categories.map((cat) => {
-        const isActive = activeCategory === cat.id;
-        const emoji = EMOJI_MAP[cat.id.toLowerCase()] || '🍽️';
-        return (
-          <button
-            key={cat.id}
-            className={`category_btn ${isActive ? 'active' : 'inactive'}`}
-            onClick={() => setCategory(cat.id)}
-          >
-            <div className="cat_inner">
-              <span className="cat_emoji">{emoji}</span>
-            </div>
-            <span className="cat_text">{cat.label}</span>
-          </button>
-        );
-      })}
-    </>
+    <div className="category-toggle-container">
+      <div className="category-pill">
+        {displayCategories.map((cat) => (
+            <button 
+              key={cat.id}
+              className={`toggle-btn ${activeCategory === cat.id ? 'active' : ''}`}
+              onClick={() => setCategory(cat.id)}
+            >
+              {cat.label}
+            </button>
+        ))}
+        
+        {/* The sliding background effect - dynamically calculated! */}
+        <div 
+            className="slider-bg" 
+            style={{ 
+                transform: `translateX(${Math.max(0, activeIndex) * 100}%)`,
+            }} 
+        />
+      </div>
+    </div>
   );
 };
 

@@ -260,7 +260,7 @@
 }
 
 /* --- MOBILE FULL SCREEN (UNDER 425px) --- */
-@media (max_width: 425px) {
+@media (max-width: 640px) {
   .checkout_overlay {
     padding: 0;
   }
@@ -274,5 +274,16 @@
   .checkout_body {
     max-height: none;
     flex: 1;
+    padding-bottom: 6rem;
+  }
+  .checkout_footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 10;
   }
 }

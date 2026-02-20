@@ -20,7 +20,7 @@ import LoadingPlate from './components/common/LoadingPlate';
 import OfflineMessage from './components/common/OfflineMessage';
 import VendorDashboard from './components/vendor/VendorDashboard';
 import AdminDashboard from './components/admin/AdminDashboard';
-
+import Profile from './components/user/Profile';
 
 export default function App() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -97,6 +97,7 @@ export default function App() {
 
                 {/* Protected Routes */}
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/vendor-dashboard" element={<VendorDashboard />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/menu/:shopId" element={<MenuDashboard />} />

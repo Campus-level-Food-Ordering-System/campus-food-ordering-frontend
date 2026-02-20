@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
     Camera, MapPin, Heart, Utensils, Pizza, Filter,
-    Coffee, ArrowLeft, Edit2, X, Save, ShoppingBag, CheckCircle, ChevronDown
+    Coffee, ArrowLeft, Edit2, X, Save, ShoppingBag, 
+    CheckCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import NavBar from '../components/NavBar';
-import { useAuth } from '../context/AuthContext';
-import coverImg from '../assets/profile-cover.png';
-import avatarImg from '../assets/avatar.png';
-import '../styles/profilecss/Profile.css';
+import NavBar from './NavBar';
+import { useAuth } from '../../context/AuthContext';
+import coverImg from '../../assets/profile-cover.png';
+import avatarImg from '../../assets/avatar.png';
+import '../../styles/profilecss/Profile.css';
 
 // --- MOCK DATA ---
 const INITIAL_ORDERS = [
@@ -26,8 +27,7 @@ export default function Profile() {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
     
-    // --- STATE ---
-    const [orders, setOrders] = useState(INITIAL_ORDERS);
+    const [orders] = useState(INITIAL_ORDERS);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [filterType, setFilterType] = useState('All');
@@ -44,7 +44,6 @@ export default function Profile() {
         year: "III Year"
     });
 
-    // --- HANDLERS ---
     const handleSaveProfile = (newData) => {
         setProfileData(newData);
         setToastMsg("Profile updated successfully!");
@@ -59,7 +58,6 @@ export default function Profile() {
         }
     };
 
-    // --- MEMOIZED CALCULATIONS ---
     const { favFood, favLocation } = useMemo(() => {
         if (!orders || orders.length === 0) return { favFood: "N/A", favLocation: "N/A" };
         const getMostFrequent = (arr, key) => {
@@ -78,13 +76,13 @@ export default function Profile() {
     const hasMoreOrders = visibleOrders.length < (filterType === 'All' ? orders.length : orders.filter(o => o.status === filterType).length);
 
     return (
-        <div className="profile-container">
+        <div className="profile-page">
             <NavBar />
             
             {toastMsg && (
-                <div className="fixed top-24 right-5 z-50 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-left">
-                    <CheckCircle className="text-green-400 w-5 h-5" />
-                    <span className="text-sm font-medium">{toastMsg}</span>
+                <div className="toast-notification animate-slide-left">
+                    <CheckCircle className="toast-icon-green" size={20} />
+                    <span>{toastMsg}</span>
                 </div>
             )}
 
@@ -95,49 +93,47 @@ export default function Profile() {
                 onSave={handleSaveProfile}
             />
 
-            <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+            <input type="file" ref={fileInputRef} className="hidden-input" accept="image/*" onChange={handleFileChange} />
 
-            {/* Banner */}
-            <div className="profile-banner">
-                <img src={coverImg} alt="Cover" className="banner-img animate-fade-in" />
-                <div className="banner-overlay"></div>
-                <div className="banner-gradient"></div>
-                <button onClick={() => navigate('/dashboard')} className="back-btn">
-                    <ArrowLeft size={24} />
+            <div className="profile-hero-banner">
+                <img src={coverImg} alt="Cover" className="hero-img animate-fade-in" />
+                <div className="hero-overlay"></div>
+                <div className="hero-gradient"></div>
+                <button onClick={() => navigate('/dashboard')} className="hero-back-btn">
+                    <ArrowLeft size={20} />
                 </button>
             </div>
 
-            {/* Main Content */}
-            <main className="profile-main">
-                <div className="profile-grid">
+            <main className="profile-main-content">
+                <div className="profile-layout-grid">
 
                     {/* Left Sidebar */}
-                    <div className="profile-sidebar-col">
-                        <div className="sidebar-card profile-sidebar-card">
-                            <button onClick={() => setIsEditOpen(true)} className="edit-icon-btn">
+                    <div className="profile-sidebar">
+                        <div className="card-container sidebar-card-animate">
+                            <button onClick={() => setIsEditOpen(true)} className="edit-profile-btn">
                                 <Edit2 size={18} />
                             </button>
 
-                            <div className="p-6 flex flex-col items-center pt-10">
-                                <div onClick={handleImageClick} className="avatar-wrapper animate-profile-img">
+                            <div className="sidebar-header">
+                                <div onClick={handleImageClick} className="avatar-container animate-fade-in">
                                     <div className="avatar-ring">
                                         <img src={avatarImg} alt="Profile" className="avatar-img" />
                                     </div>
-                                    <div className="camera-badge">
-                                        <Camera className="w-3.5 h-3.5" />
+                                    <div className="avatar-camera-badge">
+                                        <Camera size={14} />
                                     </div>
                                 </div>
 
-                                <h1 className="profile-name">{profileData.name}</h1>
-                                <span className="profile-role-badge">{profileData.role}</span>
+                                <h1 className="user-name">{profileData.name}</h1>
+                                <span className="user-role-badge">{profileData.role}</span>
 
-                                <div className="w-full mt-8 lg:hidden">
-                                    <StatsCards isMobileView={true} campus={profileData.college} favLocation={favLocation} favFood={favFood} />
+                                <div className="mobile-only-stats">
+                                    <StatsCards campus={profileData.college} favLocation={favLocation} favFood={favFood} />
                                 </div>
-                                <div className="divider"></div>
+                                <div className="section-divider"></div>
                             </div>
 
-                            <div className="info-list">
+                            <div className="user-info-list">
                                 <ProfileRow label="ID" value={profileData.id} />
                                 <ProfileRow label="Email" value={profileData.email} truncate />
                                 <ProfileRow label="College" value={profileData.college} />
@@ -148,36 +144,32 @@ export default function Profile() {
                     </div>
 
                     {/* Right Content */}
-                    <div className="profile-content-col">
-                        <div className="hidden lg:block">
+                    <div className="profile-content">
+                        <div className="desktop-only-stats">
                             <StatsCards campus={profileData.college} favLocation={favLocation} favFood={favFood} />
                         </div>
 
-                        {/* Orders Section */}
-                        <div className="orders-card orders-section">
+                        <div className="card-container orders-section-animate">
                             <div className="orders-header">
                                 <div className="orders-title">
                                     <ShoppingBag size={20} />
                                     <span>MY ORDERS</span>
                                 </div>
-                                <div className="relative">
-                                    <button 
-                                        onClick={() => setIsFilterOpen(!isFilterOpen)} 
-                                        className={`filter-btn ${isFilterOpen ? 'active' : 'inactive'}`}
-                                    >
+                                <div className="filter-dropdown-container">
+                                    <button onClick={() => setIsFilterOpen(!isFilterOpen)} className={`filter-btn ${isFilterOpen ? 'active' : ''}`}>
                                         <span>{filterType !== 'All' ? filterType : 'Filter'}</span>
-                                        <Filter className="w-5 h-5" />
+                                        <Filter size={20} />
                                     </button>
                                     
                                     {isFilterOpen && (
                                         <>
-                                            <div className="fixed inset-0 z-10" onClick={() => setIsFilterOpen(false)}></div>
-                                            <div className="dropdown-menu animate-scale-up-origin-tr">
+                                            <div className="dropdown-backdrop" onClick={() => setIsFilterOpen(false)}></div>
+                                            <div className="dropdown-menu animate-scale-up">
                                                 {['All', 'Delivered', 'Delivering', 'Preparing', 'Cancelled'].map((status) => (
                                                     <button 
                                                         key={status} 
                                                         onClick={() => { setFilterType(status); setVisibleCount(4); setIsFilterOpen(false); }} 
-                                                        className={`dropdown-item ${filterType === status ? 'selected' : 'default'}`}
+                                                        className={`dropdown-item ${filterType === status ? 'selected' : ''}`}
                                                     >
                                                         {status}
                                                     </button>
@@ -188,57 +180,64 @@ export default function Profile() {
                                 </div>
                             </div>
 
-                            <div className="overflow-x-auto flex-1">
+                            <div className="table-responsive-wrapper">
                                 <table className="orders-table">
                                     <thead>
                                         <tr>
                                             <th>Product</th>
                                             <th>Shop</th>
                                             <th>Status</th>
-                                            <th className="text-right">Total</th>
+                                            <th className="align-right">Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {visibleOrders.length > 0 ? (
                                             visibleOrders.map((order) => (
-                                                <tr key={order.id} className="table-row">
-                                                    <td className="product-cell">
-                                                        <div className="product-icon"><order.icon className="w-4 h-4" /></div>
-                                                        <div className="flex flex-col">
-                                                            <span className="font-medium text-gray-800">{order.name}</span>
-                                                            <span className="text-xs text-gray-400 md:hidden">{order.date}</span>
+                                                <tr key={order.id} className="order-row">
+                                                    <td>
+                                                    <div className="product-cell">
+                                                        <div className="product-icon"><order.icon size={16} /></div>
+                                                        <div className="product-info">
+                                                            <span className="product-name">{order.name}</span>
+                                                            <span className="mobile-date">{order.date}</span>
                                                         </div>
-                                                    </td>
-                                                    <td className="text-sm text-gray-500">
-                                                        <div className="flex flex-col">
-                                                            <span>{order.shop}</span>
-                                                            <span className="text-xs text-gray-400 hidden md:block">{order.date}</span>
-                                                        </div>
+                                                    </div>
                                                     </td>
                                                     <td>
-                                                        <span className={`status-badge ${order.statusColor}`}>
-                                                            {order.status}
-                                                        </span>
+                                                    <div className="shop-cell">
+                                                        <div className="shop-info">
+                                                            <span>{order.shop}</span>
+                                                            <span className="desktop-date">{order.date}</span>
+                                                        </div>
+                                                    </div>
                                                     </td>
-                                                    <td className="text-base font-medium text-right">{order.price}</td>
+                                                    <td>
+                                                        <span className={`status-badge ${order.statusColor}`}>{order.status}</span>
+                                                    </td>
+                                                    <td className="price-cell align-right">{order.price}</td>
                                                 </tr>
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="4" className="py-10 text-center text-gray-400 italic">No orders found.</td>
+                                                <td colSpan="4" className="empty-table-msg">No orders found.</td>
                                             </tr>
                                         )}
                                     </tbody>
                                 </table>
                             </div>
 
-                            {hasMoreOrders && (
-                                <div className="show-more-container">
-                                    <button onClick={() => setVisibleCount(prev => prev + 5)} className="show-more-btn">
+                            <div className="pagination-footer">
+                                {hasMoreOrders && (
+                                    <button onClick={() => setVisibleCount(prev => prev + 5)} className="action-link-btn text-orange">
                                         Show More <ChevronDown size={16} />
                                     </button>
-                                </div>
-                            )}
+                                )}
+                                {visibleCount > 4 && (
+                                    <button onClick={() => setVisibleCount(4)} className="action-link-btn text-gray">
+                                        Show Less <ChevronUp size={16} />
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -248,8 +247,9 @@ export default function Profile() {
 }
 
 // --- HELPER COMPONENTS ---
-const StatsCards = ({ isMobileView = false, campus, favLocation, favFood }) => (
-    <div className={isMobileView ? "flex flex-col gap-3 mx-4" : "stats-grid"}>
+
+const StatsCards = ({ campus, favLocation, favFood }) => (
+    <div className="stats-grid">
         <StatCard icon={MapPin} label="Campus" value={campus} color="indigo" />
         <StatCard icon={Heart} label="Favorite Spot" value={favLocation} color="blue" />
         <StatCard icon={Utensils} label="Go-To Meal" value={favFood} color="purple" />
@@ -258,10 +258,10 @@ const StatsCards = ({ isMobileView = false, campus, favLocation, favFood }) => (
 
 const StatCard = ({ icon: Icon, label, value, color }) => (
     <div className="stat-card">
-        <div className={`stat-icon ${color}`}>
-            <Icon className="w-5 h-5" />
+        <div className={`stat-icon-wrapper ${color}`}>
+            <Icon size={20} />
         </div>
-        <div>
+        <div className="stat-text">
             <p className="stat-label">{label}</p>
             <p className="stat-value">{value}</p>
         </div>
@@ -271,29 +271,31 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
 const ProfileRow = ({ label, value, truncate = false }) => (
     <div className="info-row">
         <span className="info-label">{label}</span>
-        <span className={`info-value ${truncate ? 'truncate max-w-[12rem]' : ''}`}>{value}</span>
+        <span className={`info-value ${truncate ? 'truncate-text' : ''}`}>{value}</span>
     </div>
 );
 
 const EditProfileModal = ({ isOpen, onClose, userData, onSave }) => {
     const [formData, setFormData] = useState(userData);
     useEffect(() => { setFormData(userData) }, [userData]);
+    
     if (!isOpen) return null;
+    
     return (
         <div className="modal-overlay animate-fade-in">
-            <div className="modal-content animate-scale-up">
+            <div className="modal-container animate-scale-up">
                 <div className="modal-header">
-                    <h3 className="text-lg font-bold text-gray-800">Edit Profile</h3>
-                    <button onClick={onClose} className="modal-close"><X size={20} /></button>
+                    <h3>Edit Profile</h3>
+                    <button onClick={onClose} className="modal-close-btn"><X size={20} /></button>
                 </div>
                 <div className="modal-body">
                     <InputField label="Display Name" value={formData.name} onChange={v => setFormData({...formData, name: v})} />
                     <InputField label="Student ID" value={formData.id} onChange={v => setFormData({...formData, id: v})} />
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="modal-form-row">
                         <InputField label="Department" value={formData.department} onChange={v => setFormData({...formData, department: v})} />
-                        <div className="form-group">
+                        <div className="input-group">
                             <label>Year</label>
-                            <select value={formData.year} onChange={(e) => setFormData({...formData, year: e.target.value})} className="form-input bg-white">
+                            <select value={formData.year} onChange={(e) => setFormData({...formData, year: e.target.value})} className="custom-input">
                                 <option>I Year</option><option>II Year</option><option>III Year</option><option>IV Year</option>
                             </select>
                         </div>
@@ -301,7 +303,9 @@ const EditProfileModal = ({ isOpen, onClose, userData, onSave }) => {
                 </div>
                 <div className="modal-footer">
                     <button onClick={onClose} className="btn-cancel">Cancel</button>
-                    <button onClick={() => { onSave(formData); onClose(); }} className="btn-save"><Save size={16} /> Save Changes</button>
+                    <button onClick={() => { onSave(formData); onClose(); }} className="btn-save">
+                        <Save size={16} /> Save Changes
+                    </button>
                 </div>
             </div>
         </div>
@@ -309,8 +313,8 @@ const EditProfileModal = ({ isOpen, onClose, userData, onSave }) => {
 };
 
 const InputField = ({ label, value, onChange }) => (
-    <div className="form-group">
+    <div className="input-group">
         <label>{label}</label>
-        <input type="text" value={value} onChange={e => onChange(e.target.value)} className="form-input" />
+        <input type="text" value={value} onChange={e => onChange(e.target.value)} className="custom-input" />
     </div>
 );
