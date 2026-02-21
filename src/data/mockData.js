@@ -75,6 +75,19 @@ export const SHOP_MENUS = {
       ]
     }
   },
+    3: {
+    name: 'Parking Chat Coffee',
+    description: 'Delicious treats & Puffs',
+    menu: {
+      food: [
+        { id: 301, name: 'Egdddg Puff', price: 1.20, image: 'https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=300&q=80' },
+        { id: 202, name: 'Chicken Roll', price: 2.80, image: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&w=300&q=80' },
+      ],
+      beverages: [
+        { id: 203, name: 'Fresh Lime Soda', price: 1.80, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=300&q=80' },
+      ]
+    }
+  },
   // Default fallback for IDs 3, 4, etc.
   default: {
     name: 'Campus Shop',

@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/authcss/SignIn.css';
 
 export default function SignIn() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, user  } = useAuth();
 
   const [userRole, setUserRole] = useState('student');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  React.useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else if (user.role === 'vendor') {
+        navigate('/vendor-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [user, navigate]);
 
   // Detect admin route from URL to switch mode
   React.useEffect(() => {
@@ -76,7 +90,7 @@ export default function SignIn() {
         }
       }
 
-      login(userData);
+      login(userData, rememberMe);
       setIsLoading(false);
 
       // Redirect based on role
@@ -103,7 +117,7 @@ export default function SignIn() {
         yearOfStudy: '2',
         role: userRole,
         authMethod: 'google'
-      });
+      }, rememberMe);
       setIsLoading(false);
       navigate('/dashboard');
     }, 1000);
@@ -131,18 +145,32 @@ export default function SignIn() {
 
         <div className="form_group animate_fade_in-2">
           <label>Password</label>
-          <input
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="form_input"
-          />
+          <div className="password_input_wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="form_input password_input"
+            />
+            <button 
+              type="button" 
+              className="password_toggle_btn"
+              onClick={() => setShowPassword(!showPassword)}
+              tabIndex="-1" // Prevents tab key from focusing the eye icon
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
 
           <div className="form_options">
             <label className="checkbox_label">
-              <input type="checkbox" />
+              <input 
+                type="checkbox" 
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
               <span>Remember me</span>
             </label>
             {userRole === 'student' && (

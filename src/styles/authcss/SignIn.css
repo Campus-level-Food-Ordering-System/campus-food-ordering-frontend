@@ -233,3 +233,38 @@ select.form_input:invalid,
 select.form_input option[value=""] {
   color: #9CA3AF;
 }
+
+/* --- New Password Toggle CSS --- */
+.password_input_wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password_input {
+  padding-right: 3rem; /* Make sure the text doesn't type under the eye icon */
+}
+
+.password_toggle_btn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #9CA3AF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.password_toggle_btn:hover {
+  color: #0077BE;
+  background-color: #F3F4F6;
+}
+
+.password_toggle_btn:focus {
+  outline: none;
+}

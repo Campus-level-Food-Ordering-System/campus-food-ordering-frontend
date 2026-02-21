@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-    Camera, MapPin, Heart, Utensils, Pizza, Filter,
-    Coffee, ArrowLeft, Edit2, X, Save, ShoppingBag, 
-    CheckCircle, ChevronDown, ChevronUp
+    Camera, MapPin, Heart, Utensils, ArrowLeft, Edit2, X, Save, CheckCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from './NavBar';
@@ -11,15 +9,12 @@ import coverImg from '../../assets/profile-cover.png';
 import avatarImg from '../../assets/avatar.png';
 import '../../styles/profilecss/Profile.css';
 
-// --- MOCK DATA ---
+// --- MOCK DATA (Kept only to calculate your fun stats like "Go-To Meal") ---
 const INITIAL_ORDERS = [
-    { id: 1, name: "Chicken Burger", shop: "Main Block Chat", date: "Oct 24, 2025", status: "Delivered", price: "₹120.00", icon: Utensils, statusColor: "green" },
-    { id: 2, name: "Paneer Pizza", shop: "Campus Pizza Corner", date: "Oct 12, 2025", status: "Delivering", price: "₹210.00", icon: Pizza, statusColor: "blue" },
-    { id: 3, name: "Masala Chai", shop: "Main Block Chat", date: "Sep 30, 2025", status: "Preparing", price: "₹35.00", icon: Coffee, statusColor: "orange" },
-    { id: 4, name: "Club Sandwich", shop: "Library Cafe", date: "Aug 15, 2025", status: "Delivered", price: "₹90.00", icon: Utensils, statusColor: "green" },
-    { id: 5, name: "Veg Momos", shop: "Main Block Chat", date: "Aug 10, 2025", status: "Delivered", price: "₹80.00", icon: Utensils, statusColor: "green" },
-    { id: 6, name: "Cold Coffee", shop: "Library Cafe", date: "Aug 05, 2025", status: "Cancelled", price: "₹60.00", icon: Coffee, statusColor: "red" },
-    { id: 7, name: "Chicken Burger", shop: "Main Block Chat", date: "Jul 28, 2025", status: "Delivered", price: "₹120.00", icon: Utensils, statusColor: "green" },
+    { id: 1, name: "Chicken Burger", shop: "Main Block Chat", status: "Delivered" },
+    { id: 2, name: "Paneer Pizza", shop: "Campus Pizza Corner", status: "Delivering" },
+    { id: 3, name: "Masala Chai", shop: "Main Block Chat", status: "Preparing" },
+    { id: 4, name: "Chicken Burger", shop: "Main Block Chat", status: "Delivered" }
 ];
 
 export default function Profile() {
@@ -29,35 +24,49 @@ export default function Profile() {
     
     const [orders] = useState(INITIAL_ORDERS);
     const [isEditOpen, setIsEditOpen] = useState(false);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [filterType, setFilterType] = useState('All');
     const [toastMsg, setToastMsg] = useState(null);
-    const [visibleCount, setVisibleCount] = useState(4);
 
-    const [profileData, setProfileData] = useState({
-        name: user?.name || "Vindhan",
-        email: user?.email || "studentuser1@skct.edu.in",
-        role: user?.role || "Student",
-        college: user?.college || "Sri Krishna College of Tech",
-        id: "727823TUCS034",
-        department: "CSE-A",
-        year: "III Year"
+    // Initialize from LocalStorage or fallback to AuthContext/Defaults
+    const [profileData, setProfileData] = useState(() => {
+        const savedProfile = localStorage.getItem('user_profile_data');
+        if (savedProfile) {
+            return JSON.parse(savedProfile);
+        }
+        return {
+            name: user?.name || "Vindhan",
+            email: user?.email || "studentuser1@skct.edu.in",
+            role: user?.role || "Student",
+            college: user?.college || "Sri Krishna College of Tech",
+            id: user?.id || "727823TUCS034",
+            department: "CSE-A",
+            year: "III Year"
+        };
+    });
+
+    const [avatarPreview, setAvatarPreview] = useState(() => {
+        return localStorage.getItem('user_avatar') || avatarImg;
     });
 
     const handleSaveProfile = (newData) => {
         setProfileData(newData);
+        localStorage.setItem('user_profile_data', JSON.stringify(newData));
         setToastMsg("Profile updated successfully!");
         setTimeout(() => setToastMsg(null), 3000);
     };
 
     const handleImageClick = () => fileInputRef.current.click();
     const handleFileChange = (e) => {
-        if (e.target.files[0]) {
+        const file = e.target.files[0];
+        if (file) {
+             const imageUrl = URL.createObjectURL(file);
+             setAvatarPreview(imageUrl);
+             localStorage.setItem('user_avatar', imageUrl);
              setToastMsg("Profile picture updated!");
              setTimeout(() => setToastMsg(null), 3000);
         }
     };
 
+    // Calculate favorites
     const { favFood, favLocation } = useMemo(() => {
         if (!orders || orders.length === 0) return { favFood: "N/A", favLocation: "N/A" };
         const getMostFrequent = (arr, key) => {
@@ -68,12 +77,7 @@ export default function Profile() {
         return { favFood: getMostFrequent(orders, 'name'), favLocation: getMostFrequent(orders, 'shop') };
     }, [orders]);
 
-    const visibleOrders = useMemo(() => {
-        const filtered = filterType === 'All' ? orders : orders.filter(o => o.status === filterType);
-        return filtered.slice(0, visibleCount);
-    }, [orders, filterType, visibleCount]);
-
-    const hasMoreOrders = visibleOrders.length < (filterType === 'All' ? orders.length : orders.filter(o => o.status === filterType).length);
+    
 
     return (
         <div className="profile-page">
@@ -100,146 +104,48 @@ export default function Profile() {
                 <div className="hero-overlay"></div>
                 <div className="hero-gradient"></div>
                 <button onClick={() => navigate('/dashboard')} className="hero-back-btn">
-                    <ArrowLeft size={20} />
+                    <ArrowLeft size={24} />
                 </button>
             </div>
 
-            <main className="profile-main-content">
-                <div className="profile-layout-grid">
+            <main className="profile-main-content centered-layout">
+                <div className="card-container standalone-profile-card sidebar-card-animate">
+                    
+                    <button onClick={() => setIsEditOpen(true)} className="edit-profile-btn" title="Edit Profile">
+                        <Edit2 size={18} />
+                    </button>
 
-                    {/* Left Sidebar */}
-                    <div className="profile-sidebar">
-                        <div className="card-container sidebar-card-animate">
-                            <button onClick={() => setIsEditOpen(true)} className="edit-profile-btn">
-                                <Edit2 size={18} />
-                            </button>
-
-                            <div className="sidebar-header">
-                                <div onClick={handleImageClick} className="avatar-container animate-fade-in">
-                                    <div className="avatar-ring">
-                                        <img src={avatarImg} alt="Profile" className="avatar-img" />
-                                    </div>
-                                    <div className="avatar-camera-badge">
-                                        <Camera size={14} />
-                                    </div>
-                                </div>
-
-                                <h1 className="user-name">{profileData.name}</h1>
-                                <span className="user-role-badge">{profileData.role}</span>
-
-                                <div className="mobile-only-stats">
-                                    <StatsCards campus={profileData.college} favLocation={favLocation} favFood={favFood} />
-                                </div>
-                                <div className="section-divider"></div>
+                    <div className="profile-header-center">
+                        <div onClick={handleImageClick} className="avatar-container animate-fade-in">
+                            <div className="avatar-ring">
+                                <img src={avatarPreview} alt="Profile" className="avatar-img" />
                             </div>
-
-                            <div className="user-info-list">
-                                <ProfileRow label="ID" value={profileData.id} />
-                                <ProfileRow label="Email" value={profileData.email} truncate />
-                                <ProfileRow label="College" value={profileData.college} />
-                                <ProfileRow label="Department" value={profileData.department} />
-                                <ProfileRow label="Year" value={profileData.year} />
+                            <div className="avatar-camera-badge">
+                                <Camera size={14} />
                             </div>
                         </div>
+
+                        <h1 className="user-name">{profileData.name}</h1>
+                        <span className="user-role-badge">{profileData.role}</span>
                     </div>
 
-                    {/* Right Content */}
-                    <div className="profile-content">
-                        <div className="desktop-only-stats">
-                            <StatsCards campus={profileData.college} favLocation={favLocation} favFood={favFood} />
-                        </div>
+                    <div className="section-divider"></div>
 
-                        <div className="card-container orders-section-animate">
-                            <div className="orders-header">
-                                <div className="orders-title">
-                                    <ShoppingBag size={20} />
-                                    <span>MY ORDERS</span>
-                                </div>
-                                <div className="filter-dropdown-container">
-                                    <button onClick={() => setIsFilterOpen(!isFilterOpen)} className={`filter-btn ${isFilterOpen ? 'active' : ''}`}>
-                                        <span>{filterType !== 'All' ? filterType : 'Filter'}</span>
-                                        <Filter size={20} />
-                                    </button>
-                                    
-                                    {isFilterOpen && (
-                                        <>
-                                            <div className="dropdown-backdrop" onClick={() => setIsFilterOpen(false)}></div>
-                                            <div className="dropdown-menu animate-scale-up">
-                                                {['All', 'Delivered', 'Delivering', 'Preparing', 'Cancelled'].map((status) => (
-                                                    <button 
-                                                        key={status} 
-                                                        onClick={() => { setFilterType(status); setVisibleCount(4); setIsFilterOpen(false); }} 
-                                                        className={`dropdown-item ${filterType === status ? 'selected' : ''}`}
-                                                    >
-                                                        {status}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="table-responsive-wrapper">
-                                <table className="orders-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Product</th>
-                                            <th>Shop</th>
-                                            <th>Status</th>
-                                            <th className="align-right">Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {visibleOrders.length > 0 ? (
-                                            visibleOrders.map((order) => (
-                                                <tr key={order.id} className="order-row">
-                                                    <td>
-                                                    <div className="product-cell">
-                                                        <div className="product-icon"><order.icon size={16} /></div>
-                                                        <div className="product-info">
-                                                            <span className="product-name">{order.name}</span>
-                                                            <span className="mobile-date">{order.date}</span>
-                                                        </div>
-                                                    </div>
-                                                    </td>
-                                                    <td>
-                                                    <div className="shop-cell">
-                                                        <div className="shop-info">
-                                                            <span>{order.shop}</span>
-                                                            <span className="desktop-date">{order.date}</span>
-                                                        </div>
-                                                    </div>
-                                                    </td>
-                                                    <td>
-                                                        <span className={`status-badge ${order.statusColor}`}>{order.status}</span>
-                                                    </td>
-                                                    <td className="price-cell align-right">{order.price}</td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="4" className="empty-table-msg">No orders found.</td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div className="pagination-footer">
-                                {hasMoreOrders && (
-                                    <button onClick={() => setVisibleCount(prev => prev + 5)} className="action-link-btn text-orange">
-                                        Show More <ChevronDown size={16} />
-                                    </button>
-                                )}
-                                {visibleCount > 4 && (
-                                    <button onClick={() => setVisibleCount(4)} className="action-link-btn text-gray">
-                                        Show Less <ChevronUp size={16} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
+                    {/* Stats Section - Now displays prominently */}
+                    <div className="profile-stats-wrapper">
+                        <StatsCards campus={profileData.college} favLocation={favLocation} favFood={favFood} />
                     </div>
+
+                    <div className="section-divider"></div>
+
+                    <div className="user-info-list">
+                        <ProfileRow label="Student ID" value={profileData.id} />
+                        <ProfileRow label="Email Address" value={profileData.email} truncate />
+                        <ProfileRow label="College" value={profileData.college} />
+                        <ProfileRow label="Department" value={profileData.department} />
+                        <ProfileRow label="Year of Study" value={profileData.year} />
+                    </div>
+
                 </div>
             </main>
         </div>
@@ -290,7 +196,7 @@ const EditProfileModal = ({ isOpen, onClose, userData, onSave }) => {
                 </div>
                 <div className="modal-body">
                     <InputField label="Display Name" value={formData.name} onChange={v => setFormData({...formData, name: v})} />
-                    <InputField label="Student ID" value={formData.id} onChange={v => setFormData({...formData, id: v})} />
+                    {/* <InputField label="Student ID" value={formData.id} onChange={v => setFormData({...formData, id: v})} />
                     <div className="modal-form-row">
                         <InputField label="Department" value={formData.department} onChange={v => setFormData({...formData, department: v})} />
                         <div className="input-group">
@@ -299,7 +205,7 @@ const EditProfileModal = ({ isOpen, onClose, userData, onSave }) => {
                                 <option>I Year</option><option>II Year</option><option>III Year</option><option>IV Year</option>
                             </select>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="modal-footer">
                     <button onClick={onClose} className="btn-cancel">Cancel</button>

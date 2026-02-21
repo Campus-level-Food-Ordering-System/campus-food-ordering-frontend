@@ -8,21 +8,27 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is logged in from localStorage on app start
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
 
-  const login = (userData) => {
+  const login = (userData, rememberMe = false) => {
     setUser(userData);
+    if (rememberMe) {
     localStorage.setItem('user', JSON.stringify(userData));
+    }
+    else {
+        sessionStorage.setItem('user', JSON.stringify(userData));
+    }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
   };
 
   return (

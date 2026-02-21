@@ -4,7 +4,7 @@ import '../../styles/menucss/CheckoutSummary.css';
 
 const CheckoutSummary = ({ cartItems, shopName, onClose, onConfirm }) => {
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    const tax = subtotal * 0.05;
+    const tax = subtotal * 0;
     const total = subtotal + tax;
 
     return (
@@ -55,14 +55,14 @@ const CheckoutSummary = ({ cartItems, shopName, onClose, onConfirm }) => {
                     <div className="bill_details_card">
                         <div className="summary_section_title">Bill Details</div>
                         <div className="bill_rows_group">
-                            <div className="bill_row">
+                            {/* <div className="bill_row">
                                 <span>Subtotal</span>
                                 <span>₹{subtotal.toFixed(2)}</span>
                             </div>
                             <div className="bill_row">
                                 <span>Tax (5%)</span>
                                 <span>₹{tax.toFixed(2)}</span>
-                            </div>
+                            </div> */}
                             <div className="divider_dashed"></div>
                             <div className="bill_row total_amount">
                                 <span>Total Paid</span>

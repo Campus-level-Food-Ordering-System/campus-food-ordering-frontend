@@ -5,7 +5,7 @@ import '../../styles/menucss/OrderDetails.css';
 const OrderDetails = ({ cartItems, onUpdateQty, onRemove, onClose, onCheckout, isMobile, shopName, isCollapsed, toggleCollapse }) => {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const discount = 0; // Mock
-  const tax = subtotal * 0.05; // Mock 5% tax
+  const tax = subtotal * 0; // Mock 5% tax
   const total = subtotal - discount + tax;
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.qty, 0);
@@ -80,7 +80,7 @@ const OrderDetails = ({ cartItems, onUpdateQty, onRemove, onClose, onCheckout, i
 
         {/* Summary */}
         <div className="sidebar_summary_card">
-          <div className="sidebar_summary_row">
+          {/* <div className="sidebar_summary_row">
             <span className="sidebar_summary_label">Subtotal</span>
             <span className="sidebar_summary_val">₹{subtotal.toFixed(2)}</span>
           </div>
@@ -92,7 +92,7 @@ const OrderDetails = ({ cartItems, onUpdateQty, onRemove, onClose, onCheckout, i
             <span className="sidebar_summary_label">Tax (5%)</span>
             <span className="sidebar_summary_val">₹{tax.toFixed(2)}</span>
           </div>
-          <div className="sidebar_divider"></div>
+          <div className="sidebar_divider"></div> */}
           <div className="sidebar_total_row">
             <span className="sidebar_total_label">Total</span>
             <span className="sidebar_total_val">₹{total.toFixed(2)}</span>

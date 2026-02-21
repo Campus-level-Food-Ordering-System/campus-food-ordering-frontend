@@ -131,12 +131,7 @@
   transition: all 0.2s;
 }
 
-@media (max-width: 769px) {
-  .sidebar_close_btn {
-    display: flex !important;
-    background: #f3f4f6;
-  }
-}
+
 
 .sidebar_orders_title {
   font-size: 1.25rem;
@@ -388,14 +383,75 @@
 
   .order_sidebar {
     height: 100vh;
-    padding-bottom: 2rem;
-    /* Extra space for the floating round button */
+    padding: 1rem 1rem 2rem 1rem; /* Reduces top & side padding to push header up */
   }
 
-  
+  .sidebar_top_icons {
+    margin-bottom: 1rem; /* Brings the items closer to the header */
+  }
 
+  /* Shrink image to give text more horizontal room */
+  .sidebar_item_img {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+  }
+
+  /* Shrink text and force single row */
+  .sidebar_item_details {
+    min-width: 0; /* Allows text truncation to work inside flexbox */
+  }
+
+  .sidebar_item_name {
+    font-size: 0.85rem;
+    white-space: nowrap; /* Forces single line */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds ... if the name is too long */
+  }
+
+  .sidebar_item_price {
+    font-size: 0.95rem;
+  }
+
+  /* Shrink quantity controls slightly */
+  .sidebar_qty_btn {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.85rem;
+  }
+  
+  .sidebar_qty_val {
+    width: 1.25rem;
+    font-size: 0.8rem;
+  }
+
+  /* Cleaned up hover effect since it is no longer floating */
   .sidebar_checkout_btn:hover:not(:disabled) {
-    transform: translateX(-50%) translateY(-3px);
+    transform: translateY(-3px); 
+  }
+
+  .sidebar_summary_card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Shrink the Total text */
+  .sidebar_total_label, 
+  .sidebar_total_val {
+    font-size: 1.1rem;
+  }
+
+  /* Shrink subtotal/tax text slightly */
+  .sidebar_summary_row {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Thinner Checkout Button */
+  .sidebar_checkout_btn {
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 0.75rem; /* Slightly smaller rounded corners */
   }
 }
 

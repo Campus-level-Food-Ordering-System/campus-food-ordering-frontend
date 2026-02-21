@@ -157,7 +157,7 @@ export default function MenuDashboard() {
               <ArrowLeft size={20} />
             </button>
 
-            <div className="shop-header-info">
+            <div className="shop-header-info" >
               <h1>{shopInfo?.name || 'Campus Shop'}</h1>
               <p>{shopInfo?.description || 'Delicious food available'}</p>
             </div>

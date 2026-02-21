@@ -76,8 +76,7 @@ export default function NavBar() {
               <button className="dropdown-item">
                 <Settings size={16} /> Settings
               </button>
-
-
+              
               <button className="dropdown-item logout" onClick={handleLogout}>
                 <LogOut size={16} /> Logout
               </button>

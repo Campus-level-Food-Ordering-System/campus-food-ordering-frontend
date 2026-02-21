@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/authcss/SignIn.css';
 
@@ -13,6 +13,8 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
@@ -77,25 +79,47 @@ export default function SignUp() {
         </div>
 
         <div className="form_group animate_fade_in_3">
+          
           <label>Password</label>
+          <div className="password_input_wrapper">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required className="form_input"
+            required
+            className="form_input password_input"
           />
+          <button
+            type="button"
+            className="password_toggle_btn"
+            onClick={() => setShowPassword(!showPassword)}
+            tabIndex="-1" // Prevents tab key from focusing the eye icon
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+          </div>
         </div>
 
         <div className="form_group animate_fade_in_4">
           <label>Confirm Password</label>
+          <div className="password_input_wrapper">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            required className="form_input"
+            required className="form_input password_input"
           />
+          <button
+            type="button"
+            className="password_toggle_btn"
+            onClick={() => setShowPassword(!showPassword)}
+            tabIndex="-1" // Prevents tab key from focusing the eye icon
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+          </div>
         </div>
 
         <button type="submit" className="submit_btn" disabled={isLoading}>

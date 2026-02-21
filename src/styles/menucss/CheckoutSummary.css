@@ -259,7 +259,7 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* --- MOBILE FULL SCREEN (UNDER 425px) --- */
+/* --- MOBILE FULL SCREEN (UNDER 640px) --- */
 @media (max-width: 640px) {
   .checkout_overlay {
     padding: 0;
@@ -271,19 +271,90 @@
     border-radius: 0;
   }
 
+  /* Compact the header to push everything up */
+  .checkout_header {
+    padding: 1rem 1.25rem;
+  }
+
+  .header_title_group h2 {
+    font-size: 1.1rem;
+  }
+
+  /* Reduce overall body padding */
   .checkout_body {
     max-height: none;
     flex: 1;
-    padding-bottom: 6rem;
+    padding: 1rem 1.25rem 6rem 1.25rem; /* Leaves 6rem bottom padding for the fixed footer */
+    gap: 1rem;
   }
+
+  /* Shrink Shop Name */
+  .shop_name_summary {
+    font-size: 1.25rem;
+  }
+
+  /* Remove arbitrary right padding on mobile */
+  .summary_items_scroll {
+    padding: 0;
+  }
+
+  /* Force single row text with ellipsis for long food names */
+  .item_info_group {
+    min-width: 0; /* Crucial: allows text truncation inside flexbox */
+  }
+
+  .item_name_text {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item_qty_badge {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .item_total_price {
+    font-size: 0.95rem;
+    flex-shrink: 0; /* Prevents the price from getting squished */
+  }
+
+  /* Make the bill details card tighter */
+  .bill_details_card {
+    padding: 1rem;
+  }
+
+  .bill_row {
+    font-size: 0.85rem;
+  }
+
+  /* Shrink Total Size */
+  .bill_row.total_amount {
+    font-size: 1.1rem;
+  }
+
+  /* Compact Payment option */
+  .payment_option.selected {
+    padding: 1rem;
+  }
+
+  /* Fixed Footer */
   .checkout_footer {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background: white;
-    padding: 1rem 1.5rem;
+    padding: 1rem 1.25rem;
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
     z-index: 10;
+  }
+
+  /* Thinner Confirm Button */
+  .confirm_order_btn {
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 0.75rem; /* Slightly smaller rounded corners */
   }
 }
