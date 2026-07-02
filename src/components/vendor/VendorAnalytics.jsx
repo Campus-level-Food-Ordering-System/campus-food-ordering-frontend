@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, DollarSign, ShoppingBag, Clock } from 'lucide-react';
+import vendorService from '../../services/vendorService';
 import '../../styles/vendorcss/VendorAnalytics.css';
-import { useOrders } from '../../context/OrderContext';
 
 export default function VendorAnalytics({ shopId }) {
-    const { orders } = useOrders();
     const [analytics, setAnalytics] = useState({
         todayOrders: 0,
         todayRevenue: 0,
@@ -12,63 +11,77 @@ export default function VendorAnalytics({ shopId }) {
         peakHour: 'N/A',
         weeklyData: [] // Store day-wise counts
     });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const sId = shopId?.toString();
-        const vendorOrders = orders.filter(o =>
-            (o.vendorId?.toString() === sId || o.shopId?.toString() === sId)
-        );
+        const fetchAnalyticsAndOrders = async () => {
+            try {
+                const [analyticsRes, ordersRes] = await Promise.all([
+                    vendorService.getAnalytics(),
+                    vendorService.getOrders({})
+                ]);
 
-        const todayDate = new Date();
-        const todayStr = todayDate.toDateString();
-        const todayOrdersList = vendorOrders.filter(o =>
-            new Date(o.timestamp).toDateString() === todayStr
-        );
+                const backendAnalytics = analyticsRes.data.data;
+                const vendorOrders = ordersRes.data.data || [];
 
-        // Revenue
-        const revenue = todayOrdersList.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0);
+                const todayOrdersList = vendorOrders.filter(o => {
+                    const orderDate = new Date(o.createdAt || o.timestamp);
+                    const todayDate = new Date();
+                    return orderDate.toDateString() === todayDate.toDateString();
+                });
 
-        // Peak Hour
-        const hourCounts = {};
-        todayOrdersList.forEach(o => {
-            const hour = new Date(o.timestamp).getHours();
-            hourCounts[hour] = (hourCounts[hour] || 0) + 1;
-        });
+                // Peak Hour
+                const hourCounts = {};
+                todayOrdersList.forEach(o => {
+                    const hour = new Date(o.createdAt || o.timestamp).getHours();
+                    hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+                });
 
-        let peak = 'N/A';
-        let maxDailyCount = 0;
-        Object.entries(hourCounts).forEach(([hour, count]) => {
-            if (count > maxDailyCount) {
-                maxDailyCount = count;
-                const h = parseInt(hour);
-                const ampm = h >= 12 ? 'PM' : 'AM';
-                const displayH = h % 12 || 12;
-                peak = `${displayH}:00 ${ampm} - ${displayH + 1}:00 ${ampm}`;
+                let peak = 'N/A';
+                let maxDailyCount = 0;
+                Object.entries(hourCounts).forEach(([hour, count]) => {
+                    if (count > maxDailyCount) {
+                        maxDailyCount = count;
+                        const h = parseInt(hour);
+                        const ampm = h >= 12 ? 'PM' : 'AM';
+                        const displayH = h % 12 || 12;
+                        peak = `${displayH}:00 ${ampm} - ${displayH + 1}:00 ${ampm}`;
+                    }
+                });
+
+                // Weekly Trends (Last 7 Days)
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const weekly = [];
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const dStr = d.toDateString();
+                    const count = vendorOrders.filter(o => new Date(o.createdAt || o.timestamp).toDateString() === dStr).length;
+                    weekly.push({
+                        label: days[d.getDay()],
+                        count: count
+                    });
+                }
+
+                setAnalytics({
+                    todayOrders: backendAnalytics.todayOrders,
+                    todayRevenue: backendAnalytics.todayRevenue,
+                    avgOrderValue: backendAnalytics.todayOrders > 0 
+                        ? backendAnalytics.todayRevenue / backendAnalytics.todayOrders 
+                        : 0,
+                    peakHour: peak,
+                    weeklyData: weekly
+                });
+
+            } catch (err) {
+                console.error("Failed to fetch analytics", err);
+            } finally {
+                setLoading(false);
             }
-        });
+        };
 
-        // Weekly Trends (Last 7 Days)
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const weekly = [];
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            const dStr = d.toDateString();
-            const count = vendorOrders.filter(o => new Date(o.timestamp).toDateString() === dStr).length;
-            weekly.push({
-                label: days[d.getDay()],
-                count: count
-            });
-        }
-
-        setAnalytics({
-            todayOrders: todayOrdersList.length,
-            todayRevenue: revenue,
-            avgOrderValue: todayOrdersList.length > 0 ? revenue / todayOrdersList.length : 0,
-            peakHour: peak,
-            weeklyData: weekly
-        });
-    }, [orders, shopId]);
+        fetchAnalyticsAndOrders();
+    }, [shopId]);
 
     const stats = [
         {
@@ -80,14 +93,14 @@ export default function VendorAnalytics({ shopId }) {
         },
         {
             label: "Today's Revenue",
-            value: `₹${analytics.todayRevenue.toFixed(2)}`,
+            value: `₹${Number(analytics.todayRevenue).toFixed(2)}`,
             icon: DollarSign,
             color: '#2196F3',
             bgColor: '#E3F2FD',
         },
         {
             label: 'Avg Order Value',
-            value: `₹${analytics.avgOrderValue.toFixed(2)}`,
+            value: `₹${Number(analytics.avgOrderValue).toFixed(2)}`,
             icon: TrendingUp,
             color: '#FF9800',
             bgColor: '#FFF3E0',
@@ -100,6 +113,10 @@ export default function VendorAnalytics({ shopId }) {
             bgColor: '#F3E5F5',
         },
     ];
+
+    if (loading) {
+        return <div className="vendor_analytics"><div style={{textAlign: 'center', marginTop: '2rem'}}>Loading analytics...</div></div>;
+    }
 
     return (
         <div className="vendor_analytics">

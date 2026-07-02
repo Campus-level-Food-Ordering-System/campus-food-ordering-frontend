@@ -1,20 +1,38 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AdminSidebar from './AdminSidebar';
 import AdminAnalytics from './AdminAnalytics';
 import AdminVendors from './AdminVendors';
 import AdminOrders from './AdminOrders';
 import AdminPayments from './AdminPayments';
 import { Menu, User, Bell, X } from 'lucide-react';
-import { useOrders } from '../../context/OrderContext';
-import { useMenu } from '../../context/MenuContext';
+import adminService from '../../services/adminService';
 import '../../styles/admincss/AdminDashboard.css';
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('analytics');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
-    const { orders } = useOrders();
-    const { shops } = useMenu();
+    const [orders, setOrders] = useState([]);
+    const [vendors, setVendors] = useState([]);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                const [ordersRes, vendorsRes] = await Promise.all([
+                    adminService.getOrders(),
+                    adminService.getVendors()
+                ]);
+                setOrders(ordersRes.data.data || []);
+                setVendors(vendorsRes.data.data || []);
+            } catch (err) {
+                console.error("Failed to fetch admin notifications data", err);
+            }
+        };
+
+        fetchDashboardData();
+        const interval = setInterval(fetchDashboardData, 30000); // refresh every 30s
+        return () => clearInterval(interval);
+    }, []);
 
     // Generate dynamic notifications based on real data
     const notifications = useMemo(() => {
@@ -24,29 +42,29 @@ export default function AdminDashboard() {
         const recentOrders = orders.slice(0, 3);
         recentOrders.forEach((order, idx) => {
             notifs.push({
-                id: `order-${order.id}`,
+                id: `order-${order.orderId}`,
                 type: 'order',
                 title: 'New Order',
-                message: `Order #${order.orderId} placed by ${order.customerName} at ${order.shopName}`,
-                time: new Date(order.timestamp).toLocaleString(),
+                message: `Order #${order.orderId} placed by ${order.customerName} at ${order.vendorName}`,
+                time: new Date(order.createdAt || Date.now()).toLocaleString(),
                 read: idx > 0
             });
         });
 
         // Add vendor status updates
-        shops.forEach((shop, idx) => {
+        vendors.forEach((shop, idx) => {
             notifs.push({
                 id: `vendor-${shop.vendorId}`,
                 type: 'vendor',
-                title: shop.isActive ? 'Vendor Active' : 'Vendor Inactive',
-                message: `${shop.name} is currently ${shop.isActive ? 'online' : 'offline'} at ${shop.location || 'Location TBD'}`,
+                title: shop.status === 'ACTIVE' ? 'Vendor Active' : 'Vendor Inactive',
+                message: `${shop.vendorName} is currently ${shop.isOpen ? 'online' : 'offline'}`,
                 time: new Date().toLocaleString(),
                 read: idx > 0
             });
         });
 
         // Add revenue notifications
-        const totalRevenue = orders.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0);
+        const totalRevenue = orders.reduce((sum, o) => sum + (parseFloat(o.totalAmount || o.amount) || 0), 0);
         if (totalRevenue > 0) {
             notifs.push({
                 id: 'revenue',
@@ -59,7 +77,7 @@ export default function AdminDashboard() {
         }
 
         return notifs.slice(0, 6); // Limit to 6 most recent
-    }, [orders, shops]);
+    }, [orders, vendors]);
 
     const renderContent = () => {
         switch (activeTab) {
@@ -148,7 +166,7 @@ export default function AdminDashboard() {
                             <div className="admin_avatar">
                                 <User size={18} />
                             </div>
-                            <span className="admin_name">Later implementation</span>
+                            <span className="admin_name">Admin</span>
                         </div>
                     </div>
                 </header>

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import authService from '../../services/authService';
 import '../../styles/authcss/EmailVerification.css';
 
 export default function EmailVerification() {
@@ -9,6 +10,8 @@ export default function EmailVerification() {
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [resendMsg, setResendMsg] = useState('');
   const inputRefs = useRef([]);
 
   const handleChange = (index, value) => {
@@ -50,21 +53,46 @@ export default function EmailVerification() {
     inputRefs.current[nextIndex]?.focus();
   };
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
     const code = otp.join('');
+    setError('');
 
     if (code.length !== 6) {
-      alert('Please enter all 6 digits');
+      setError('Please enter all 6 digits');
       return;
     }
 
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      await authService.verifyEmail({ email, code });
+      navigate('/signin');
+    } catch (err) {
+      console.error('Verification error:', err);
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Verification failed. Please try again.');
+      }
+    } finally {
       setIsLoading(false);
-      navigate('/college-verification');
-    }, 1500);
+    }
+  };
+
+  const handleResend = async () => {
+    setError('');
+    setResendMsg('');
+    try {
+      await authService.resendVerificationCode({ email });
+      setResendMsg('Verification code resent successfully.');
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Failed to resend code. Please try again.');
+      }
+    }
   };
 
   return (
@@ -79,6 +107,9 @@ export default function EmailVerification() {
           We've sent a verification code to<br />
           <span className="email_highlight">{email}</span>
         </p>
+
+        {error && <div className="error_banner" style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>}
+        {resendMsg && <div className="success_banner" style={{ color: 'green', textAlign: 'center', marginBottom: '10px' }}>{resendMsg}</div>}
 
         <form onSubmit={handleVerify} className="verify_form">
           <label className="verify_label">Enter Verification Code</label>
@@ -106,7 +137,7 @@ export default function EmailVerification() {
         </form>
 
         <div className="verify_footer">
-          Didn't receive code? <button type="button" className="resend_link">Resend</button>
+          Didn't receive code? <button type="button" className="resend_link" onClick={handleResend}>Resend</button>
         </div>
       </div>
     </>

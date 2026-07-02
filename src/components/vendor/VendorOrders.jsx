@@ -1,29 +1,49 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, CheckCircle, Package, AlertCircle } from 'lucide-react';
+import vendorService from '../../services/vendorService';
 import '../../styles/vendorcss/VendorOrders.css';
-import { useOrders } from '../../context/OrderContext';
 
 export default function VendorOrders({ onNewOrder, shopId }) {
-    const { orders, updateOrderStatus } = useOrders();
+    const [orders, setOrders] = useState([]);
     const [filter, setFilter] = useState('all');
-    const previousOrderCountRef = useRef(0);
+    const [loading, setLoading] = useState(true);
 
-    // Filter orders for the current vendor
-    // Filter orders for the current vendor - use robust string comparison
-    const vendorOrders = orders.filter(order => {
-        const orderVendorId = (order.vendorId || order.shopId || order.id)?.toString();
-        const currentShopId = shopId?.toString();
-        return orderVendorId === currentShopId;
-    });
+    const fetchOrders = async () => {
+        try {
+            const params = filter === 'all' ? {} : { status: filter };
+            const res = await vendorService.getOrders(params);
+            const fetchedOrders = res.data.data || [];
+            setOrders(fetchedOrders);
+            
+            // If viewing all, calculate new orders (PAID)
+            if (filter === 'all') {
+                const newOrdersCount = fetchedOrders.filter(o => o.status === 'PAID').length;
+                onNewOrder?.(newOrdersCount);
+            }
+        } catch (err) {
+            console.error("Failed to fetch vendor orders:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    // Sync new order count to dashboard for notification badges
     useEffect(() => {
-        const newOrdersCount = vendorOrders.filter(o => o.status === 'PAID').length;
-        onNewOrder?.(newOrdersCount);
-    }, [vendorOrders, onNewOrder]);
+        setLoading(true);
+        fetchOrders();
+        // Set up polling every 30 seconds for new orders
+        const interval = setInterval(fetchOrders, 30000);
+        return () => clearInterval(interval);
+    }, [filter, shopId]); // Added shopId in dependency just in case it changes
 
-    const handleUpdateStatus = (orderId, newStatus) => {
-        updateOrderStatus(orderId, newStatus);
+    const handleUpdateStatus = async (orderId, newStatus) => {
+        try {
+            await vendorService.updateOrderStatus(orderId, { status: newStatus });
+            // Optimistically update or refetch
+            fetchOrders();
+        } catch (err) {
+            console.error("Failed to update status:", err);
+            alert("Failed to update order status.");
+        }
     };
 
     // Get next status
@@ -35,12 +55,6 @@ export default function VendorOrders({ onNewOrder, shopId }) {
         };
         return statusFlow[currentStatus];
     };
-
-    // Filter orders by status
-    const filteredOrders = vendorOrders.filter((order) => {
-        if (filter === 'all') return true;
-        return order.status === filter;
-    });
 
     // Format time
     const formatTime = (timestamp) => {
@@ -65,6 +79,10 @@ export default function VendorOrders({ onNewOrder, shopId }) {
         return badges[status] || { label: status, icon: Clock, className: '' };
     };
 
+    if (loading) {
+        return <div className="vendor_orders"><div style={{textAlign: 'center', marginTop: '2rem'}}>Loading orders...</div></div>;
+    }
+
     return (
         <div className="vendor_orders">
             <div className="orders_header">
@@ -74,52 +92,52 @@ export default function VendorOrders({ onNewOrder, shopId }) {
                         onClick={() => setFilter('all')}
                         className={`filter_btn ${filter === 'all' ? 'active' : ''}`}
                     >
-                        All ({vendorOrders.length})
+                        All
                     </button>
                     <button
                         onClick={() => setFilter('PAID')}
                         className={`filter_btn ${filter === 'PAID' ? 'active' : ''}`}
                     >
-                        New ({vendorOrders.filter(o => o.status === 'PAID').length})
+                        New
                     </button>
                     <button
                         onClick={() => setFilter('PREPARING')}
                         className={`filter_btn ${filter === 'PREPARING' ? 'active' : ''}`}
                     >
-                        Preparing ({vendorOrders.filter(o => o.status === 'PREPARING').length})
+                        Preparing
                     </button>
                     <button
                         onClick={() => setFilter('READY_FOR_PICKUP')}
                         className={`filter_btn ${filter === 'READY_FOR_PICKUP' ? 'active' : ''}`}
                     >
-                        Ready ({vendorOrders.filter(o => o.status === 'READY_FOR_PICKUP').length})
+                        Ready
                     </button>
                 </div>
             </div>
 
-            {vendorOrders.length === 0 ? (
+            {orders.length === 0 ? (
                 <div className="orders_empty">
                     <Package size={48} />
                     <p>No orders found yet</p>
                 </div>
             ) : (
                 <div className="orders_grid">
-                    {filteredOrders.map((order) => {
+                    {orders.map((order) => {
                         const statusBadge = getStatusBadge(order.status);
                         const StatusIcon = statusBadge.icon;
                         const nextStatus = getNextStatus(order.status);
 
-                        // Map cartItems to items for display
-                        const itemsToDisplay = order.cartItems || order.items || [];
+                        // Map items for display
+                        const itemsToDisplay = order.items || [];
 
                         return (
-                            <div key={order.orderId} className="order_card">
+                            <div key={order.orderId || order.id} className="order_card">
                                 <div className="order_header">
                                     <div className="order_id">
-                                        <span className="order_number">#{order.orderId}</span>
+                                        <span className="order_number">#{order.orderId || order.id}</span>
                                         <span className="order_time">
                                             <Clock size={14} />
-                                            {formatTime(order.timestamp)}
+                                            {formatTime(order.createdAt || order.timestamp)}
                                         </span>
                                     </div>
                                     <div className={`order_status ${statusBadge.className}`}>
@@ -129,16 +147,16 @@ export default function VendorOrders({ onNewOrder, shopId }) {
                                 </div>
 
                                 <div className="order_customer">
-                                    <strong>{order.customerName}</strong>
+                                    <strong>{order.customerName || order.studentName}</strong>
                                 </div>
 
                                 <div className="order_items">
                                     {itemsToDisplay.map((item, idx) => (
                                         <div key={idx} className="order_item">
                                             <span className="item_name">
-                                                {item.qty || item.quantity}x {item.name}
+                                                {item.quantity}x {item.itemName || item.name}
                                             </span>
-                                            <span className="item_price">₹{(item.price * (item.qty || item.quantity)).toFixed(2)}</span>
+                                            <span className="item_price">₹{(item.unitPrice * item.quantity).toFixed(2)}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -146,11 +164,11 @@ export default function VendorOrders({ onNewOrder, shopId }) {
                                 <div className="order_footer">
                                     <div className="order_total">
                                         <strong>Total:</strong>
-                                        <span className="total_amount">₹{parseFloat(order.total).toFixed(2)}</span>
+                                        <span className="total_amount">₹{parseFloat(order.totalAmount || order.total).toFixed(2)}</span>
                                     </div>
                                     {nextStatus && nextStatus !== 'COMPLETED' && order.status !== 'CANCELLED' && (
                                         <button
-                                            onClick={() => handleUpdateStatus(order.orderId, nextStatus)}
+                                            onClick={() => handleUpdateStatus(order.orderId || order.id, nextStatus)}
                                             className="order_action_btn"
                                         >
                                             {nextStatus === 'PREPARING' && 'Start Preparing'}
@@ -164,7 +182,9 @@ export default function VendorOrders({ onNewOrder, shopId }) {
                                                     <AlertCircle size={16} />
                                                     <div>
                                                         <strong>Cancelled by {order.cancelledBy === 'ADMIN' ? 'Admin' : 'User'}</strong>
-                                                        <p className="v_cancel_time">on {new Date(order.cancelledAt).toLocaleDateString()} at {new Date(order.cancelledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                                        {order.cancelledAt && (
+                                                            <p className="v_cancel_time">on {new Date(order.cancelledAt).toLocaleDateString()} at {new Date(order.cancelledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 {order.cancelReason && (

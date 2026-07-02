@@ -11,7 +11,7 @@ import OrderSuccess from './OrderSuccess';
 
 import { useOrders } from '../../context/OrderContext';
 import { useCart } from '../../context/CartContext';
-import { useMenu } from '../../context/MenuContext';
+import userService from '../../services/userService';
 
 import '../../styles/menucss/MenuDashboard.css';
 
@@ -21,41 +21,43 @@ export default function MenuDashboard() {
 
   const { addOrder } = useOrders();
   const { getCart, addToCart, updateQty, removeFromCart, clearCart } = useCart();
-  const { menus, shops } = useMenu();
 
-  /* ==============================
-     SHOP VALIDATION (OLD LOGIC)
-  ============================== */
+  const [shopInfo, setShopInfo] = useState(null);
+  const [shopMenu, setShopMenu] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const currentShop = shops.find(
-      s => s.vendorId.toString() === shopId?.toString()
-    );
+    const fetchData = async () => {
+      try {
+        const [vendorRes, menuRes] = await Promise.all([
+          userService.getVendors(),
+          userService.getVendorMenu(shopId)
+        ]);
+        
+        const vendors = vendorRes.data.data || [];
+        const currentShop = vendors.find(s => s.vendorId.toString() === shopId);
+        
+        if (!currentShop || currentShop.isActive === false || currentShop.isOpen === false) {
+          navigate('/dashboard', { replace: true });
+          return;
+        }
 
-    if (!currentShop || currentShop.isActive === false || currentShop.isOpen === false) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [shops, shopId, navigate]);
+        setShopInfo(currentShop);
+        setShopMenu(menuRes.data.data || []);
+      } catch (error) {
+        console.error("Failed to fetch menu data", error);
+        navigate('/dashboard', { replace: true });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [shopId, navigate]);
 
-  const sId = shopId?.toString();
-  const shopInfo = shops.find(s => s.vendorId.toString() === sId) || shops[0];
-  const shopMenu = menus[sId] || menus['default'] || { menu: {} };
-
-  /* ==============================
-     CATEGORY + SEARCH
-  ============================== */
-  const availableCategories = Object.keys(shopMenu.menu || {}).map(key => ({
-    id: key,
-    label: key.charAt(0).toUpperCase() + key.slice(1)
-  }));
-
-  const [activeCategory, setActiveCategory] = useState(
-    availableCategories[0]?.id || 'food'
-  );
+  const availableCategories = [{ id: 'all', label: 'All Items' }];
+  const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  /* ==============================
-     CART + UI STATES
-  ============================== */
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -63,14 +65,8 @@ export default function MenuDashboard() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const cart = getCart(shopId);
 
-  /* ==============================
-     HANDLERS
-  ============================== */
   const handleAddToCart = (clickedId) => {
-    const categoryItems = shopMenu.menu[activeCategory] || [];
-
-    // Find the exact item using either id or itemId
-    const itemToAdd = categoryItems.find(
+    const itemToAdd = shopMenu.find(
       item =>
         (item.itemId && item.itemId.toString() === clickedId?.toString()) ||
         (item.id && item.id.toString() === clickedId?.toString())
@@ -101,28 +97,72 @@ export default function MenuDashboard() {
     }
   };
 
-  const handleConfirmOrder = pickupSlot => {
-    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const handleConfirmOrder = async (pickupSlot) => {
+    try {
+      const orderRequest = {
+        vendorId: parseInt(shopId),
+        items: cart.map(item => ({
+          itemId: item.itemId || item.id,
+          quantity: item.qty
+        })),
+        pickupSlot
+      };
+      
+      const resOrder = await userService.createOrder(orderRequest);
+      const savedOrder = resOrder.data.data;
 
-    const orderData = {
-      vendorId: parseInt(shopId),
-      items: cart.map(item => ({
-        itemId: item.itemId,
-        quantity: item.qty
-      })),
-      pickupSlot,
-      cartItems: cart,
-      total,
-      shopName: shopInfo?.name,
-      status: 'PAID'
-    };
+      // Now create payment for this order
+      const resPayment = await userService.createPayment({ orderId: savedOrder.id });
+      const paymentData = resPayment.data.data;
 
-    const savedOrder = addOrder(orderData);
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_dummykey",
+        amount: paymentData.amount * 100,
+        currency: "INR",
+        name: "Campus Food",
+        description: "Order Payment",
+        order_id: paymentData.paymentId,
+        handler: async function (response) {
+          try {
+            await userService.verifyPayment({
+              orderId: savedOrder.id,
+              paymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature
+            });
 
-    setLastOrderDetails(savedOrder);
-    clearCart(shopId);
-    setShowCheckout(false);
-    setShowSuccess(true);
+            // Payment successful, show success
+            const localOrder = {
+                ...savedOrder,
+                cartItems: cart,
+                shopName: shopInfo?.name,
+                status: 'PAID'
+            };
+            
+            addOrder(localOrder);
+            setLastOrderDetails(localOrder);
+            clearCart(shopId);
+            setShowCheckout(false);
+            setShowSuccess(true);
+          } catch (verifyErr) {
+            console.error("Payment verification failed", verifyErr);
+            alert("Payment verification failed. Please contact support.");
+          }
+        },
+        theme: {
+          color: "#ea580c"
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response){
+          alert("Payment failed: " + response.error.description);
+      });
+      rzp.open();
+
+    } catch (err) {
+      console.error("Failed to create order or payment", err);
+      alert("Failed to place order. Please try again.");
+    }
   };
 
   const handleCloseSuccess = () => {
@@ -130,18 +170,16 @@ export default function MenuDashboard() {
     setLastOrderDetails(null);
   };
 
-  /* ==============================
-     FILTERED MENU
-  ============================== */
-  const filteredItems = (shopMenu.menu[activeCategory] || [])
+  const filteredItems = shopMenu
     .filter(item => item.available !== false)
     .filter(item =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-  /* ==============================
-     UI
-  ============================== */
+  if (loading) {
+    return <div className="menu-dashboard-container"><NavBar /><div style={{textAlign: 'center', marginTop: '2rem'}}>Loading menu...</div></div>;
+  }
+
   return (
     <div className="menu-dashboard-container">
       <NavBar />

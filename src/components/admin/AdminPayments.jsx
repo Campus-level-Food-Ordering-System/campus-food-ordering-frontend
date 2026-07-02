@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     CreditCard,
     Download,
@@ -7,29 +7,38 @@ import {
     AlertCircle,
     FileText
 } from 'lucide-react';
-import { useOrders } from '../../context/OrderContext';
+import adminService from '../../services/adminService';
 
 const AdminPayments = () => {
-    const { orders } = useOrders();
+    const [payments, setPayments] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Derive payments from orders
-    const payments = useMemo(() => {
-        return orders.map(order => ({
-            id: `PAY-${order.id}`,
-            orderId: order.orderId || order.id,
-            customer: order.customerName,
-            amount: order.total,
-            method: 'Pay at Counter',
-            status: order.status === 'CANCELLED' ? 'REFUNDED' : 'SUCCESS',
-            timestamp: order.timestamp
-        }));
-    }, [orders]);
+    useEffect(() => {
+        const fetchPayments = async () => {
+            try {
+                const res = await adminService.getPayments();
+                setPayments(res.data.data || []);
+            } catch (err) {
+                console.error("Failed to fetch payments", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPayments();
+    }, []);
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'SUCCESS': return { color: '#10b981', bg: '#ecfdf5' };
-            case 'REFUNDED': return { color: '#ef4444', bg: '#fef2f2' };
-            default: return { color: '#64748b', bg: '#f1f5f9' };
+            case 'SUCCESS':
+            case 'COMPLETED':
+            case 'PAID':
+                return { color: '#10b981', bg: '#ecfdf5' };
+            case 'REFUNDED':
+            case 'FAILED':
+                return { color: '#ef4444', bg: '#fef2f2' };
+            default:
+                return { color: '#64748b', bg: '#f1f5f9' };
         }
     };
 
@@ -44,13 +53,13 @@ const AdminPayments = () => {
 
         // Convert payments to CSV rows
         const rows = payments.map(pay => [
-            pay.id,
+            pay.paymentId || pay.id,
             pay.orderId,
-            pay.customer,
+            pay.customerName || pay.customer,
             parseFloat(pay.amount).toFixed(2),
-            pay.method,
+            pay.method || 'Razorpay',
             pay.status,
-            new Date(pay.timestamp).toLocaleString()
+            new Date(pay.createdAt || pay.timestamp).toLocaleString()
         ]);
 
         // Combine headers and rows
@@ -72,6 +81,10 @@ const AdminPayments = () => {
         link.click();
         document.body.removeChild(link);
     };
+
+    if (loading) {
+        return <div className="admin_section"><div style={{textAlign: 'center', marginTop: '2rem'}}>Loading payments...</div></div>;
+    }
 
     return (
         <div className="admin_section payment_logs">
@@ -112,20 +125,21 @@ const AdminPayments = () => {
                         ) : (
                             payments.map((pay) => {
                                 const style = getStatusStyle(pay.status);
+                                const dateObj = new Date(pay.createdAt || Date.now());
                                 return (
-                                    <tr key={pay.id}>
-                                        <td><div className="txn_id"><FileText size={14} /> {pay.id.substring(0, 12)}...</div></td>
+                                    <tr key={pay.paymentId}>
+                                        <td><div className="txn_id"><FileText size={14} /> PAY-{pay.paymentId}</div></td>
                                         <td>#{pay.orderId}</td>
-                                        <td>{pay.customer}</td>
+                                        <td>{pay.customerName}</td>
                                         <td><strong>₹{parseFloat(pay.amount).toFixed(2)}</strong></td>
                                         <td>{pay.method}</td>
                                         <td>
                                             <span className="status_badge" style={{ backgroundColor: style.bg, color: style.color }}>
-                                                {pay.status === 'SUCCESS' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
+                                                {(pay.status === 'SUCCESS' || pay.status === 'COMPLETED') ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
                                                 {pay.status}
                                             </span>
                                         </td>
-                                        <td>{new Date(pay.timestamp).toLocaleDateString()}</td>
+                                        <td>{dateObj.toLocaleDateString()}</td>
                                     </tr>
                                 );
                             })

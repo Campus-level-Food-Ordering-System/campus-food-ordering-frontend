@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import authService from '../../services/authService';
+import CustomDropdown from '../common/CustomDropdown';
 import '../../styles/authcss/SignIn.css';
 
 export default function SignUp() {
@@ -12,12 +14,59 @@ export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [collegeName, setCollegeName] = useState('');
+  const [department, setDepartment] = useState('');
+  const [yearOfStudy, setYearOfStudy] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const collegeOptions = [
+    { value: 'SKCT', label: 'SKCT' },
+    { value: 'SKASC', label: 'SKASC' }
+  ];
+
+  const departmentOptions =
+    collegeName === 'SKCT'
+      ? [
+        { value: 'CSE', label: 'Computer Science (CSE)' },
+        { value: 'IT', label: 'Information Technology (IT)' },
+        { value: 'ECE', label: 'Electronics (ECE)' },
+        { value: 'MECH', label: 'Mechanical (MECH)' }
+      ]
+      : collegeName === 'SKASC'
+        ? [
+          { value: 'COMMERCE', label: 'Commerce Stream' },
+          { value: 'COMPUTER', label: 'Computer Stream' },
+          { value: 'MANAGEMENT', label: 'Management' },
+          { value: 'ARTS_SCIENCE', label: 'Arts and Science' }
+        ]
+        : [];
+
+  const yearOptions =
+    collegeName === 'SKCT'
+      ? [
+        { value: '1', label: '1st Year' },
+        { value: '2', label: '2nd Year' },
+        { value: '3', label: '3rd Year' },
+        { value: '4', label: '4th Year' }
+      ]
+      : collegeName === 'SKASC'
+        ? [
+          { value: '1', label: '1st Year' },
+          { value: '2', label: '2nd Year' },
+          { value: '3', label: '3rd Year' }
+        ]
+        : [];
+
+  const handleCollegeChange = (val) => {
+    setCollegeName(val);
+    setDepartment('');
+    setYearOfStudy('');
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -26,24 +75,40 @@ export default function SignUp() {
       return;
     }
 
+    if (!collegeName || !department || !yearOfStudy) {
+      setError('Please select your college details');
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate API Call for Standard Sign Up
-    setTimeout(() => {
-      setIsLoading(false);
-      // NOTE: We do NOT login yet. We send them to verify email first.
+    try {
+      await authService.signup({
+        username,
+        email,
+        password,
+        role: 'USER',
+        authType: 'PASSWORD',
+        collegeName,
+        department,
+        yearOfStudy
+      });
       navigate('/email-verification', { state: { email } });
-    }, 1500);
+    } catch (err) {
+      console.error('Signup error:', err);
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Failed to create account. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignUp = () => {
-    // Simulate Google Auth
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      // Google users are already verified, so go straight to College Profile
-      navigate('/college-verification', { state: { email: 'google-user@example.com' } });
-    }, 1000);
+    // Google Auth handled externally or later
+    setError('Google Sign Up is temporarily disabled.');
   };
 
   return (
@@ -53,7 +118,7 @@ export default function SignUp() {
         <p>Join CampusEats today!</p>
       </div>
 
-      {error && <div className="error_banner">{error}</div>}
+      {error && <div className="error_banner" style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>}
 
       <form onSubmit={handleSubmit} className="auth_form">
         <div className="form_group animate_fade_in_1">
@@ -78,8 +143,39 @@ export default function SignUp() {
           />
         </div>
 
+        <div className="form_group animate_fade_in_3" style={{ zIndex: 10 }}>
+          <label>College Name</label>
+          <CustomDropdown
+            placeholder="Select College"
+            options={collegeOptions}
+            value={collegeName}
+            onChange={handleCollegeChange}
+          />
+        </div>
+
+        <div className="form_group animate_fade_in_3" style={{ zIndex: 9 }}>
+          <label>Department</label>
+          <CustomDropdown
+            placeholder="Select Department"
+            options={departmentOptions}
+            value={department}
+            onChange={(val) => setDepartment(val)}
+            disabled={!collegeName}
+          />
+        </div>
+
+        <div className="form_group animate_fade_in_3" style={{ zIndex: 8 }}>
+          <label>Year of Study</label>
+          <CustomDropdown
+            placeholder="Select Year"
+            options={yearOptions}
+            value={yearOfStudy}
+            onChange={(val) => setYearOfStudy(val)}
+            disabled={!collegeName}
+          />
+        </div>
+
         <div className="form_group animate_fade_in_3">
-          
           <label>Password</label>
           <div className="password_input_wrapper">
           <input
@@ -94,7 +190,7 @@ export default function SignUp() {
             type="button"
             className="password_toggle_btn"
             onClick={() => setShowPassword(!showPassword)}
-            tabIndex="-1" // Prevents tab key from focusing the eye icon
+            tabIndex="-1"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
@@ -115,7 +211,7 @@ export default function SignUp() {
             type="button"
             className="password_toggle_btn"
             onClick={() => setShowPassword(!showPassword)}
-            tabIndex="-1" // Prevents tab key from focusing the eye icon
+            tabIndex="-1"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
@@ -149,3 +245,4 @@ export default function SignUp() {
     </>
   );
 }
+

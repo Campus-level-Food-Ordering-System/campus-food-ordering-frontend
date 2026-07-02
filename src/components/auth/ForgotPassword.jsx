@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, KeyRound, ArrowLeft } from 'lucide-react';
+import authService from '../../services/authService';
 import '../../styles/authcss/SignIn.css';
 import '../../styles/authcss/ForgotPassword.css';
 
@@ -10,15 +11,27 @@ export default function ForgotPassword() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [codeSent, setCodeSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const inputRefs = useRef([]);
 
-  const handleSendCode = (e) => {
+  const handleSendCode = async (e) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    
+    try {
+      await authService.forgotPassword({ email });
       setCodeSent(true);
-    }, 1500);
+    } catch (err) {
+      console.error('Forgot password error:', err);
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Failed to send reset code. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (index, value) => {
@@ -65,10 +78,9 @@ export default function ForgotPassword() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate('/change-password', { state: { email } });
-    }, 1500);
+    // verification is done in ChangePassword along with the new password
+    navigate('/change-password', { state: { email, resetCode: code } });
+    setIsLoading(false);
   };
 
   return (
@@ -81,6 +93,8 @@ export default function ForgotPassword() {
         <h2>Forgot Password? 🔑</h2>
         <p>{codeSent ? 'Enter the code sent to your email' : 'Enter your email to receive a reset code'}</p>
       </div>
+
+      {error && <div className="error_banner" style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>}
 
       {!codeSent ? (
         <form onSubmit={handleSendCode} className="auth_form">

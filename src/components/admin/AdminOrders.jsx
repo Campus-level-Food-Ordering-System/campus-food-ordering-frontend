@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Search,
     Filter,
@@ -11,22 +11,54 @@ import {
     ArrowLeft,
     ShoppingBag
 } from 'lucide-react';
-import { useOrders } from '../../context/OrderContext';
+import adminService from '../../services/adminService';
 
 const AdminOrders = () => {
-    const { orders, emergencyCancelOrder } = useOrders();
+    const [orders, setOrders] = useState([]);
     const [filterStatus, setFilterStatus] = useState('ALL');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [orderDetails, setOrderDetails] = useState(null);
     const [cancelReason, setCancelReason] = useState('');
     const [showCancelModal, setShowCancelModal] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    const fetchOrders = async () => {
+        try {
+            const res = await adminService.getOrders();
+            setOrders(res.data.data || []);
+        } catch (err) {
+            console.error("Failed to fetch orders", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+
+    const fetchOrderDetails = async (orderId) => {
+        try {
+            const res = await adminService.getOrderDetails(orderId);
+            setOrderDetails(res.data.data);
+        } catch (err) {
+            console.error("Failed to fetch order details", err);
+        }
+    };
+
+    const handleSelectOrder = (order) => {
+        setSelectedOrder(order);
+        setOrderDetails(null);
+        fetchOrderDetails(order.orderId);
+    };
 
     const filteredOrders = orders.filter(order => {
         const matchesStatus = filterStatus === 'ALL' || order.status === filterStatus;
         const matchesSearch =
             order.orderId?.toString().includes(searchQuery) ||
             order.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            order.shopName?.toLowerCase().includes(searchQuery.toLowerCase());
+            order.vendorName?.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesStatus && matchesSearch;
     });
 
@@ -41,16 +73,26 @@ const AdminOrders = () => {
         return config[status] || { label: status, color: '#64748b', bg: '#f8fafc', icon: Clock };
     };
 
-    const handleCancelSubmit = (e) => {
+    const handleCancelSubmit = async (e) => {
         e.preventDefault();
         if (selectedOrder) {
-            emergencyCancelOrder(selectedOrder.orderId || selectedOrder.id, cancelReason);
-            setShowCancelModal(false);
-            setCancelReason('');
-            // Close the drawer to see the updated orders list
-            setSelectedOrder(null);
+            try {
+                await adminService.emergencyCancelOrder(selectedOrder.orderId, { reason: cancelReason });
+                setShowCancelModal(false);
+                setCancelReason('');
+                setSelectedOrder(null);
+                setOrderDetails(null);
+                fetchOrders(); // Refresh list
+            } catch (err) {
+                console.error("Failed to cancel order", err);
+                alert("Failed to cancel order");
+            }
         }
     };
+
+    if (loading) {
+        return <div className="admin_section"><div style={{textAlign: 'center', marginTop: '2rem'}}>Loading orders...</div></div>;
+    }
 
     return (
         <div className="admin_section orders_oversight">
@@ -104,18 +146,19 @@ const AdminOrders = () => {
                             filteredOrders.map((order) => {
                                 const status = getStatusInfo(order.status);
                                 const StatusIcon = status.icon;
+                                const dateObj = new Date(order.createdAt || Date.now());
                                 return (
-                                    <tr key={order.id} onClick={() => setSelectedOrder(order)} className="clickable_row">
-                                        <td><strong>#{order.orderId || order.id}</strong></td>
+                                    <tr key={order.orderId} onClick={() => handleSelectOrder(order)} className="clickable_row">
+                                        <td><strong>#{order.orderId}</strong></td>
                                         <td>
                                             <div className="time_info">
-                                                <span>{new Date(order.timestamp).toLocaleDateString()}</span>
-                                                <span className="sub_text">{new Date(order.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                <span>{dateObj.toLocaleDateString()}</span>
+                                                <span className="sub_text">{dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </td>
                                         <td>{order.customerName}</td>
-                                        <td>{order.shopName || `Shop ${order.vendorId}`}</td>
-                                        <td>₹{parseFloat(order.total).toFixed(2)}</td>
+                                        <td>{order.vendorName}</td>
+                                        <td>₹{parseFloat(order.amount).toFixed(2)}</td>
                                         <td>
                                             <span className="status_badge" style={{ backgroundColor: status.bg, color: status.color }}>
                                                 <StatusIcon size={14} />
@@ -143,7 +186,7 @@ const AdminOrders = () => {
                             <button className="back_btn" onClick={() => setSelectedOrder(null)}>
                                 <ArrowLeft size={20} />
                             </button>
-                            <h3>Order #{(selectedOrder.orderId || selectedOrder.id)}</h3>
+                            <h3>Order #{selectedOrder.orderId}</h3>
                             <button className="close_btn" onClick={() => setSelectedOrder(null)}><XCircle size={20} /></button>
                         </div>
 
@@ -168,18 +211,24 @@ const AdminOrders = () => {
 
                             <section className="drawer_section">
                                 <h4>Items Summary</h4>
-                                <div className="drawer_items_list">
-                                    {(selectedOrder.cartItems || []).map((item, idx) => (
-                                        <div key={idx} className="drawer_item">
-                                            <span>{item.qty}x {item.name}</span>
-                                            <span>₹{(item.price * item.qty).toFixed(2)}</span>
+                                {orderDetails ? (
+                                    <>
+                                        <div className="drawer_items_list">
+                                            {(orderDetails.items || []).map((item, idx) => (
+                                                <div key={idx} className="drawer_item">
+                                                    <span>{item.quantity}x {item.name}</span>
+                                                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
-                                <div className="drawer_total">
-                                    <span>Total Amount Paid</span>
-                                    <strong>₹{parseFloat(selectedOrder.total).toFixed(2)}</strong>
-                                </div>
+                                        <div className="drawer_total">
+                                            <span>Total Amount</span>
+                                            <strong>₹{parseFloat(selectedOrder.amount).toFixed(2)}</strong>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div style={{padding: '1rem', textAlign: 'center'}}>Loading items...</div>
+                                )}
                             </section>
 
                             {selectedOrder.status === 'CANCELLED' && (
@@ -188,10 +237,9 @@ const AdminOrders = () => {
                                     <div className="alert_box danger">
                                         <AlertTriangle size={18} />
                                         <div>
-                                            <strong>Reason:</strong> {selectedOrder.cancelReason || 'N/A'}
+                                            <strong>Reason:</strong> Emergency Cancelled
                                         </div>
                                     </div>
-                                    <p className="cancel_time">Cancelled on {new Date(selectedOrder.cancelledAt).toLocaleString()}</p>
                                 </section>
                             )}
 
@@ -220,7 +268,7 @@ const AdminOrders = () => {
                             <button onClick={() => setShowCancelModal(false)}><XCircle size={20} /></button>
                         </div>
                         <p className="modal_description">
-                            You are about to cancel a PAID order. This action will notify the vendor and student.
+                            You are about to cancel an order. This action will notify the vendor and student.
                         </p>
                         <div className="admin_modal_form">
                             <div className="form_group_admin">
@@ -240,7 +288,6 @@ const AdminOrders = () => {
                                     type="button"
                                     className="confirm_btn danger_bg"
                                     onClick={(e) => {
-                                        e.preventDefault();
                                         if (!cancelReason.trim()) {
                                             alert('Please enter a cancellation reason');
                                             return;

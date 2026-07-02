@@ -21,6 +21,7 @@ import OfflineMessage from './components/common/OfflineMessage';
 import VendorDashboard from './components/vendor/VendorDashboard';
 import AdminDashboard from './components/admin/AdminDashboard';
 import Profile from './components/user/Profile';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 export default function App() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -96,12 +97,12 @@ export default function App() {
                 <Route path="/loading-demo" element={<LoadingDemo />} />
 
                 {/* Protected Routes */}
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/vendor-dashboard" element={<VendorDashboard />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/menu/:shopId" element={<MenuDashboard />} />
-                <Route path="/orders" element={<Orders />} />
+                <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['USER']}><Dashboard /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute allowedRoles={['USER']}><Profile /></ProtectedRoute>} />
+                <Route path="/vendor-dashboard" element={<ProtectedRoute allowedRoles={['VENDOR']}><VendorDashboard /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute allowedRoles={['ADMIN']}><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/menu/:shopId" element={<ProtectedRoute allowedRoles={['USER']}><MenuDashboard /></ProtectedRoute>} />
+                <Route path="/orders" element={<ProtectedRoute allowedRoles={['USER']}><Orders /></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to="/signin" replace />} />
               </Routes>
             </Router>

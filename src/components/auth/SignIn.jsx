@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import authService from '../../services/authService';
 import '../../styles/authcss/SignIn.css';
 
 export default function SignIn() {
@@ -15,6 +16,7 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   React.useEffect(() => {
     if (user) {
@@ -37,71 +39,49 @@ export default function SignIn() {
     }
   }, [location.pathname]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage('');
 
-    // Simulate API Call
-    setTimeout(() => {
-      let userData = null;
+    try {
+      // Map frontend userRole to backend Role enum
+      let role = 'USER';
+      if (userRole === 'admin') role = 'ADMIN';
+      if (userRole === 'vendor') role = 'VENDOR';
 
-      // 1. Check for Admin
-      if (email === 'admin@gmail.com' && password === 'admin123') {
-        userData = {
-          email,
-          role: 'admin',
-          username: 'Super Admin'
-        };
-      }
-      // 2. Check for Dynamic Vendors
-      else {
-        const vendorAccounts = JSON.parse(localStorage.getItem('vendor_accounts') || '{}');
-        // Iterate over values since keys are now IDs
-        const dynamicVendor = Object.values(vendorAccounts).find(acc => acc.email === email);
+      const response = await authService.signin({
+        email,
+        password,
+        role
+      });
 
-        if (dynamicVendor && dynamicVendor.password === password) {
-          userData = {
-            email,
-            role: 'vendor',
-            vendorId: dynamicVendor.vendorId || Object.keys(vendorAccounts).find(key => vendorAccounts[key] === dynamicVendor),
-            vendorName: dynamicVendor.name || dynamicVendor.vendorName
-          };
-        }
-        // 3. Check for Static Mock Vendor (Legacy)
-        else if (email === 'ven@gmail.com') {
-          userData = {
-            email,
-            role: 'vendor',
-            vendorId: 1,
-            vendorName: 'Main Block Chat Coffee'
-          };
-        }
-        // 4. Default to Student (Simulated)
-        else {
-          userData = {
-            id: Math.floor(Math.random() * 1000),
-            username: email.split('@')[0],
-            email,
-            collegeName: 'SKCT',
-            department: 'CSE',
-            yearOfStudy: '3',
-            role: 'student'
-          };
-        }
-      }
-
+      const { token, ...userData } = response.data.data;
+      
+      // Store token
+      localStorage.setItem('accessToken', token);
+      
+      // Login context
       login(userData, rememberMe);
-      setIsLoading(false);
 
       // Redirect based on role
-      if (userData.role === 'admin') {
+      if (userData.role === 'ADMIN') {
         navigate('/admin');
-      } else if (userData.role === 'vendor') {
+      } else if (userData.role === 'VENDOR') {
         navigate('/vendor-dashboard');
       } else {
         navigate('/dashboard');
       }
-    }, 1500);
+    } catch (error) {
+      console.error('Signin error:', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage('Failed to sign in. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignIn = () => {
@@ -129,6 +109,12 @@ export default function SignIn() {
         <h2>{userRole === 'student' ? 'Welcome Back! 👋' : 'Admin Portal 🔐'}</h2>
         <p>{userRole === 'student' ? 'Sign in to your student account' : 'Access the admin dashboard'}</p>
       </div>
+
+      {errorMessage && (
+        <div className="error_message" style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>
+          {errorMessage}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="auth_form">
         <div className="form_group animate_fade_in-1">

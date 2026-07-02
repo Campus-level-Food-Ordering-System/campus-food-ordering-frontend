@@ -12,7 +12,7 @@ const MenuCard = ({ id, itemId, name, price, image, category, onAdd }) => {
   return (
     <div className="menu-card"> 
       <div className={`menu-card-image-container ${isBeverage ? 'beverage-mode' : ''}`}>
-        <img src={image} alt={name} className="menu-card-image" />
+        <img src={image || 'https://via.placeholder.com/150?text=Food'} alt={name} className="menu-card-image" />
       </div>
       
       <div className="menu-card-details">

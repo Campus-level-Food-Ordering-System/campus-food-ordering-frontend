@@ -1,28 +1,49 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Users, ShoppingBag, DollarSign, Store, TrendingUp, ArrowUpRight } from 'lucide-react';
-import { useOrders } from '../../context/OrderContext';
-import { useMenu } from '../../context/MenuContext';
+import adminService from '../../services/adminService';
 
 const AdminAnalytics = () => {
-    const { orders } = useOrders();
-    const { shops } = useMenu();
+    const [statsData, setStatsData] = useState({
+        totalUsers: 0,
+        totalVendors: 0,
+        totalOrders: 0,
+        totalRevenue: 0
+    });
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Mock users count (since we don't have a global users context yet, 
-    // but we can estimate from localStorage or unique customerNames in orders)
-    const totalUsersEstimate = useMemo(() => {
-        const uniqueCustomers = new Set(orders.map(o => o.customerName));
-        return Math.max(uniqueCustomers.size, 12) + 1200; // Adding mock base offset for demo
-    }, [orders]);
+    useEffect(() => {
+        const fetchAnalytics = async () => {
+            try {
+                const [dashRes, ordersRes] = await Promise.all([
+                    adminService.getDashboard(),
+                    adminService.getOrders()
+                ]);
+                
+                const dashData = dashRes.data.data;
+                setStatsData({
+                    totalUsers: dashData.totalUsers || 0,
+                    totalVendors: dashData.totalVendors || 0,
+                    totalOrders: dashData.totalOrders || 0,
+                    totalRevenue: dashData.totalRevenue || 0
+                });
+                
+                setOrders(ordersRes.data.data || []);
+            } catch (err) {
+                console.error("Failed to fetch admin analytics", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAnalytics();
+    }, []);
 
     const stats = useMemo(() => {
-        const totalRevenue = orders.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0);
-        const activeVendors = shops.length;
-        const totalOrders = orders.length;
-
         return [
             {
                 label: 'Total Users',
-                value: totalUsersEstimate.toLocaleString(),
+                value: statsData.totalUsers.toLocaleString(),
                 icon: Users,
                 color: '#6366f1',
                 bg: '#eef2ff',
@@ -30,7 +51,7 @@ const AdminAnalytics = () => {
             },
             {
                 label: 'Total Vendors',
-                value: activeVendors.toLocaleString(),
+                value: statsData.totalVendors.toLocaleString(),
                 icon: Store,
                 color: '#10b981',
                 bg: '#ecfdf5',
@@ -38,7 +59,7 @@ const AdminAnalytics = () => {
             },
             {
                 label: 'Total Orders',
-                value: totalOrders.toLocaleString(),
+                value: statsData.totalOrders.toLocaleString(),
                 icon: ShoppingBag,
                 color: '#f59e0b',
                 bg: '#fffbeb',
@@ -46,14 +67,14 @@ const AdminAnalytics = () => {
             },
             {
                 label: 'Total Revenue',
-                value: `₹${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+                value: `₹${Number(statsData.totalRevenue).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
                 icon: DollarSign,
                 color: '#8b5cf6',
                 bg: '#f5f3ff',
                 trend: '+24%'
             },
         ];
-    }, [orders, shops, totalUsersEstimate]);
+    }, [statsData]);
 
     // Trend Data Calculation
     const chartData = useMemo(() => {
@@ -63,8 +84,11 @@ const AdminAnalytics = () => {
             const d = new Date();
             d.setDate(d.getDate() - i);
             const dStr = d.toDateString();
-            const dailyOrders = orders.filter(o => new Date(o.timestamp).toDateString() === dStr);
-            const revenue = dailyOrders.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0);
+            const dailyOrders = orders.filter(o => {
+                const orderDate = new Date(o.createdAt || o.timestamp);
+                return orderDate.toDateString() === dStr;
+            });
+            const revenue = dailyOrders.reduce((sum, o) => sum + (parseFloat(o.totalAmount || o.amount) || 0), 0);
             weekly.push({
                 label: days[d.getDay()],
                 revenue: revenue,
@@ -73,6 +97,10 @@ const AdminAnalytics = () => {
         }
         return weekly;
     }, [orders]);
+
+    if (loading) {
+        return <div className="admin_section"><div style={{textAlign: 'center', marginTop: '2rem'}}>Loading analytics...</div></div>;
+    }
 
     return (
         <div className="admin_section analytics_dashboard">

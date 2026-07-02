@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Package, ShoppingBag, BarChart3, User, LogOut, Bell, AlertCircle } from 'lucide-react';
-import { useMenu } from '../../context/MenuContext';
+import vendorService from '../../services/vendorService';
 import VendorOrders from './VendorOrders';
 import VendorMenu from './VendorMenu';
 import VendorAnalytics from './VendorAnalytics';
@@ -12,16 +12,40 @@ import '../../styles/vendorcss/VendorDashboard.css';
 export default function VendorDashboard() {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const { shops, toggleShopStatus } = useMenu();
     const [activeTab, setActiveTab] = useState('orders');
     const [newOrderCount, setNewOrderCount] = useState(0);
+    const [vendorProfile, setVendorProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const shopId = user?.vendorId?.toString() || "1";
-    const currentShop = shops.find(s => s.vendorId.toString() === shopId.toString());
+    const shopId = vendorProfile?.vendorId?.toString() || "1";
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await vendorService.getProfile();
+                setVendorProfile(res.data.data);
+            } catch (err) {
+                console.error("Failed to fetch vendor profile", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, []);
 
     const handleLogout = () => {
         logout();
         navigate('/signin');
+    };
+
+    const handleToggleStatus = () => {
+        // Toggle locally since no backend endpoint exists
+        if (vendorProfile && vendorProfile.status !== 'SUSPENDED') {
+            setVendorProfile(prev => ({
+                ...prev,
+                isOpen: !prev.isOpen
+            }));
+        }
     };
 
     const tabs = [
@@ -40,11 +64,18 @@ export default function VendorDashboard() {
             case 'analytics':
                 return <VendorAnalytics shopId={shopId} />;
             case 'profile':
-                return <VendorProfile shopId={shopId} />;
+                return <VendorProfile shopId={shopId} profile={vendorProfile} />;
             default:
                 return <VendorOrders onNewOrder={(count) => setNewOrderCount(count)} shopId={shopId} />;
         }
     };
+
+    if (loading) {
+        return <div className="vendor_dashboard"><div style={{textAlign: 'center', marginTop: '2rem'}}>Loading vendor data...</div></div>;
+    }
+
+    const isActive = vendorProfile?.status !== 'SUSPENDED';
+    const isOpen = vendorProfile?.isOpen;
 
     return (
         <div className="vendor_dashboard">
@@ -52,23 +83,23 @@ export default function VendorDashboard() {
             <header className="vendor_header">
                 <div className="vendor_header_content">
                     <div className="vendor_logo">
-                        <h1>🍽️ CampusEats Vendor</h1>
+                        <h1>🍽️ {vendorProfile?.vendorName || 'CampusEats Vendor'}</h1>
                         <p className="vendor_email">{user?.email}</p>
                     </div>
 
                     <div className="vendor_header_actions">
-                        <div className={`shop_status_toggle ${currentShop?.isOpen && currentShop?.isActive ? 'active' : 'inactive'} ${!currentShop?.isActive ? 'suspended' : ''}`}
-                            onClick={() => currentShop?.isActive && toggleShopStatus(shopId)}
-                            title={!currentShop?.isActive ? "Disabled by Administrator" : ""}>
+                        <div className={`shop_status_toggle ${isOpen && isActive ? 'active' : 'inactive'} ${!isActive ? 'suspended' : ''}`}
+                            onClick={handleToggleStatus}
+                            title={!isActive ? "Disabled by Administrator" : ""}>
                             <span className="status_label">
-                                {!currentShop?.isActive ? 'Shop Suspended' : (currentShop?.isOpen ? 'Shop Open' : 'Shop Closed')}
+                                {!isActive ? 'Shop Suspended' : (isOpen ? 'Shop Open' : 'Shop Closed')}
                             </span>
                             <div className="toggle_switch">
                                 <div className="toggle_knob"></div>
                             </div>
                         </div>
 
-                        {!currentShop?.isActive && (
+                        {!isActive && (
                             <div className="admin_suspension_alert">
                                 <AlertCircle size={16} />
                                 <span>Platform access restricted by Admin</span>

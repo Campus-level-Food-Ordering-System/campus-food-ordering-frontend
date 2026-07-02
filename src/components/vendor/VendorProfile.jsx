@@ -1,34 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Store, Mail, Phone, MapPin, Clock, Edit2, Save } from 'lucide-react';
 import '../../styles/vendorcss/VendorProfile.css';
-import { useMenu } from '../../context/MenuContext';
 
-export default function VendorProfile({ shopId }) {
-    const { shops, updateShopProfile } = useMenu();
-    const currentShop = shops.find(s =>
-    (s.vendorId === shopId || s.vendorId?.toString() === shopId.toString() ||
-        s.id === shopId || s.id?.toString() === shopId.toString())
-    ) || shops[0] || { name: 'Unknown Shop', description: '' };
-
+export default function VendorProfile({ shopId, profile }) {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
-        shopName: currentShop.name,
-        email: 'ven@gmail.com',
+        shopName: '',
+        email: 'vendor@campuseats.com',
         phone: '+91 98765 43210',
         address: 'Main Campus Building, Ground Floor',
         openingTime: '08:00 AM',
         closingTime: '08:00 PM',
-        description: currentShop.description || 'Serving delicious and hygienic food to students and staff.',
+        description: 'Serving delicious and hygienic food to students and staff.',
     });
 
-    // Update form when context changes (e.g. initial load)
     useEffect(() => {
-        setFormData(prev => ({
-            ...prev,
-            shopName: currentShop.name,
-            description: currentShop.description
-        }));
-    }, [currentShop.name, currentShop.description]);
+        if (profile) {
+            setFormData(prev => ({
+                ...prev,
+                shopName: profile.vendorName || 'CampusEats Vendor',
+            }));
+        }
+    }, [profile]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -36,24 +29,20 @@ export default function VendorProfile({ shopId }) {
     };
 
     const handleSave = () => {
-        updateShopProfile(shopId, {
-            name: formData.shopName,
-            description: formData.description
-        });
+        // Backend doesn't support updating profile fields yet
+        alert("Updating profile details is not fully supported by the backend yet.");
         setIsEditing(false);
-        console.log('Profile updated in context:', formData);
     };
 
     const handleCancel = () => {
-        setFormData(prev => ({
-            ...prev,
-            shopName: currentShop.name,
-            description: currentShop.description
-        }));
+        if (profile) {
+            setFormData(prev => ({
+                ...prev,
+                shopName: profile.vendorName || 'CampusEats Vendor',
+            }));
+        }
         setIsEditing(false);
     };
-
-    const profile = formData; // Use formData directly for display as it reflects context or edits
 
     return (
         <div className="vendor_profile">
@@ -100,7 +89,7 @@ export default function VendorProfile({ shopId }) {
                                     onChange={handleInputChange}
                                 />
                             ) : (
-                                <p>{profile.shopName}</p>
+                                <p>{formData.shopName}</p>
                             )}
                         </div>
 
@@ -109,7 +98,7 @@ export default function VendorProfile({ shopId }) {
                                 <Mail size={18} />
                                 Email
                             </label>
-                            <p>{profile.email}</p>
+                            <p>{formData.email}</p>
                         </div>
 
                         <div className="profile_field">
@@ -125,7 +114,7 @@ export default function VendorProfile({ shopId }) {
                                     onChange={handleInputChange}
                                 />
                             ) : (
-                                <p>{profile.phone}</p>
+                                <p>{formData.phone}</p>
                             )}
                         </div>
 
@@ -142,7 +131,7 @@ export default function VendorProfile({ shopId }) {
                                     onChange={handleInputChange}
                                 />
                             ) : (
-                                <p>{profile.address}</p>
+                                <p>{formData.address}</p>
                             )}
                         </div>
 
@@ -160,7 +149,7 @@ export default function VendorProfile({ shopId }) {
                                         onChange={handleInputChange}
                                     />
                                 ) : (
-                                    <p>{profile.openingTime}</p>
+                                    <p>{formData.openingTime}</p>
                                 )}
                             </div>
 
@@ -177,7 +166,7 @@ export default function VendorProfile({ shopId }) {
                                         onChange={handleInputChange}
                                     />
                                 ) : (
-                                    <p>{profile.closingTime}</p>
+                                    <p>{formData.closingTime}</p>
                                 )}
                             </div>
                         </div>
@@ -192,7 +181,7 @@ export default function VendorProfile({ shopId }) {
                                     rows="4"
                                 />
                             ) : (
-                                <p>{profile.description}</p>
+                                <p>{formData.description}</p>
                             )}
                         </div>
                     </div>

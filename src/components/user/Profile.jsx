@@ -5,52 +5,68 @@ import {
 import { useNavigate } from 'react-router-dom';
 import NavBar from './NavBar';
 import { useAuth } from '../../context/AuthContext';
+import userService from '../../services/userService';
 import coverImg from '../../assets/profile-cover.png';
 import avatarImg from '../../assets/avatar.png';
 import '../../styles/profilecss/Profile.css';
-
-// --- MOCK DATA (Kept only to calculate your fun stats like "Go-To Meal") ---
-const INITIAL_ORDERS = [
-    { id: 1, name: "Chicken Burger", shop: "Main Block Chat", status: "Delivered" },
-    { id: 2, name: "Paneer Pizza", shop: "Campus Pizza Corner", status: "Delivering" },
-    { id: 3, name: "Masala Chai", shop: "Main Block Chat", status: "Preparing" },
-    { id: 4, name: "Chicken Burger", shop: "Main Block Chat", status: "Delivered" }
-];
 
 export default function Profile() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
     
-    const [orders] = useState(INITIAL_ORDERS);
+    const [orders, setOrders] = useState([]);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [toastMsg, setToastMsg] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Initialize from LocalStorage or fallback to AuthContext/Defaults
-    const [profileData, setProfileData] = useState(() => {
-        const savedProfile = localStorage.getItem('user_profile_data');
-        if (savedProfile) {
-            return JSON.parse(savedProfile);
-        }
-        return {
-            name: user?.name || "Vindhan",
-            email: user?.email || "studentuser1@skct.edu.in",
-            role: user?.role || "Student",
-            college: user?.college || "Sri Krishna College of Tech",
-            id: user?.id || "727823TUCS034",
-            department: "CSE-A",
-            year: "III Year"
-        };
+    const [profileData, setProfileData] = useState({
+        name: "",
+        email: "",
+        role: "",
+        college: "",
+        id: "",
+        department: "",
+        year: ""
     });
 
     const [avatarPreview, setAvatarPreview] = useState(() => {
         return localStorage.getItem('user_avatar') || avatarImg;
     });
 
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            try {
+                const [profileRes, ordersRes] = await Promise.all([
+                    userService.getProfile(),
+                    userService.getOrders()
+                ]);
+                
+                const profile = profileRes.data.data;
+                setProfileData({
+                    name: profile.username || "Student",
+                    email: profile.email || "",
+                    role: profile.role || "User",
+                    college: profile.collegeName || "N/A",
+                    id: profile.id || "",
+                    department: profile.department || "N/A",
+                    year: profile.yearOfStudy ? profile.yearOfStudy + " Year" : "N/A"
+                });
+
+                setOrders(ordersRes.data.data || []);
+            } catch (err) {
+                console.error("Failed to fetch profile info:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfileData();
+    }, []);
+
     const handleSaveProfile = (newData) => {
         setProfileData(newData);
-        localStorage.setItem('user_profile_data', JSON.stringify(newData));
-        setToastMsg("Profile updated successfully!");
+        // Note: Ideally call an API to update user profile here
+        setToastMsg("Profile updated locally!");
         setTimeout(() => setToastMsg(null), 3000);
     };
 
@@ -69,15 +85,32 @@ export default function Profile() {
     // Calculate favorites
     const { favFood, favLocation } = useMemo(() => {
         if (!orders || orders.length === 0) return { favFood: "N/A", favLocation: "N/A" };
-        const getMostFrequent = (arr, key) => {
-            const counts = arr.reduce((acc, item) => { acc[item[key]] = (acc[item[key]] || 0) + 1; return acc; }, {});
+        
+        let allItems = [];
+        let allShops = [];
+        
+        orders.forEach(order => {
+            allShops.push(order.vendorName || order.shopName);
+            const items = order.items || order.cartItems || [];
+            items.forEach(item => {
+                allItems.push(item.itemName || item.name);
+            });
+        });
+
+        const getMostFrequent = (arr) => {
+            const counts = arr.reduce((acc, item) => { 
+                if (item) acc[item] = (acc[item] || 0) + 1; 
+                return acc; 
+            }, {});
             if (Object.keys(counts).length === 0) return "N/A";
             return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
         };
-        return { favFood: getMostFrequent(orders, 'name'), favLocation: getMostFrequent(orders, 'shop') };
+        return { favFood: getMostFrequent(allItems), favLocation: getMostFrequent(allShops) };
     }, [orders]);
 
-    
+    if (loading) {
+        return <div className="profile-page"><NavBar /><div style={{textAlign: 'center', marginTop: '2rem'}}>Loading profile...</div></div>;
+    }
 
     return (
         <div className="profile-page">
@@ -131,7 +164,7 @@ export default function Profile() {
 
                     <div className="section-divider"></div>
 
-                    {/* Stats Section - Now displays prominently */}
+                    {/* Stats Section */}
                     <div className="profile-stats-wrapper">
                         <StatsCards campus={profileData.college} favLocation={favLocation} favFood={favFood} />
                     </div>
@@ -139,7 +172,7 @@ export default function Profile() {
                     <div className="section-divider"></div>
 
                     <div className="user-info-list">
-                        <ProfileRow label="Student ID" value={profileData.id} />
+                        <ProfileRow label="User ID" value={profileData.id} />
                         <ProfileRow label="Email Address" value={profileData.email} truncate />
                         <ProfileRow label="College" value={profileData.college} />
                         <ProfileRow label="Department" value={profileData.department} />
@@ -196,16 +229,6 @@ const EditProfileModal = ({ isOpen, onClose, userData, onSave }) => {
                 </div>
                 <div className="modal-body">
                     <InputField label="Display Name" value={formData.name} onChange={v => setFormData({...formData, name: v})} />
-                    {/* <InputField label="Student ID" value={formData.id} onChange={v => setFormData({...formData, id: v})} />
-                    <div className="modal-form-row">
-                        <InputField label="Department" value={formData.department} onChange={v => setFormData({...formData, department: v})} />
-                        <div className="input-group">
-                            <label>Year</label>
-                            <select value={formData.year} onChange={(e) => setFormData({...formData, year: e.target.value})} className="custom-input">
-                                <option>I Year</option><option>II Year</option><option>III Year</option><option>IV Year</option>
-                            </select>
-                        </div>
-                    </div> */}
                 </div>
                 <div className="modal-footer">
                     <button onClick={onClose} className="btn-cancel">Cancel</button>
